@@ -1,0 +1,100 @@
+@page "/"
+@using DevTeam.Web.Models
+@inject HttpClient Http
+@inject IStringLocalizer<Strings> L
+@inject NavigationManager Navigation
+
+<PageTitle>DevTeam AI | Adel Kobansson – Lead AI &amp; Solutions Engineer</PageTitle>
+
+@* ───────────── Hero ───────────── *@
+<HeroSection />
+
+@* ───────────── AI App Builder: primär konverteringsyta direkt under heron ───────────── *@
+<AppBuilder Profiles="_profiles" />
+
+@* ───────────── Utvecklarprofiler ───────────── *@
+<section id="profiler" class="anchor-section mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeader Eyebrow="@L["Profiles.Eyebrow"]"
+                   Title="@L["Profiles.Title"]"
+                   Subtitle="@L["Profiles.Subtitle"]" />
+
+    <div class="mt-14">
+        @if (_loading)
+        {
+            <div class="mx-auto max-w-3xl" aria-busy="true" aria-label="@L["Profiles.Loading"]">
+                <div class="animate-pulse rounded-2xl border border-white/10 bg-white/[0.03] p-8">
+                    <div class="flex items-center gap-5">
+                        <div class="h-20 w-20 rounded-2xl bg-white/10"></div>
+                        <div class="flex-1 space-y-3">
+                            <div class="h-5 w-1/2 rounded bg-white/10"></div>
+                            <div class="h-4 w-1/3 rounded bg-white/5"></div>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <div class="h-3 w-full rounded bg-white/5"></div>
+                        <div class="h-3 w-5/6 rounded bg-white/5"></div>
+                        <div class="h-3 w-2/3 rounded bg-white/5"></div>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (_error is not null)
+        {
+            <div class="mx-auto max-w-xl rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center backdrop-blur-md" role="alert">
+                <h3 class="text-lg font-semibold text-red-200">@L["Profiles.ErrorTitle"]</h3>
+                <p class="mt-2 text-sm text-red-300/80">@_error</p>
+                <p class="mt-1 text-xs text-red-300/60">@L["Profiles.ErrorHint", Http.BaseAddress?.ToString() ?? ""]</p>
+                <button @onclick="LoadProfilesAsync" class="btn btn-glass mt-5 !py-2">@L["Common.Retry"]</button>
+            </div>
+        }
+        else if (_profiles.Count == 0)
+        {
+            <p class="text-center text-zinc-500">@L["Profiles.Empty"]</p>
+        }
+        else
+        {
+            <div class="mx-auto max-w-3xl">
+                @for (var i = 0; i < _profiles.Count; i++)
+                {
+                    <ProfileCard Profile="_profiles[i]" Accent="cyan" RevealDelayMs="@(i * 120)" />
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@* ───────────── Projekt ───────────── *@
+<ProjectList />
+
+@* ───────────── Kontakt ───────────── *@
+<ContactForm Profiles="_profiles" Loading="_loading" />
+
+@code {
+    private List<DeveloperProfile> _profiles = [];
+    private bool _loading = true;
+    private string? _error;
+
+    // Aktuellt språk (sv/en) – API:et returnerar biografier på det språket.
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    protected override Task OnInitializedAsync() => LoadProfilesAsync();
+
+    private async Task LoadProfilesAsync()
+    {
+        _loading = true;
+        _error = null;
+
+        try
+        {
+            _profiles = await Http.GetFromJsonAsync<List<DeveloperProfile>>($"api/profiles?lang={Language}") ?? [];
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

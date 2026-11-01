@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="sv" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#09090b" />
+    <meta name="description" content="DevTeam AI i Stockholm: Adel Kobansson bygger och levererar din applikation från grunden med modern .NET och AI. Du beskriver idén – vi tar den till produktion." />
+    <title>DevTeam AI | Adel Kobansson</title>
+    <base href="/" />
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/tailwind.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <script type="importmap"></script>
+    <!-- Sätter html[lang] från sparat språkval innan första målningen -->
+    <script src="js/language.js"></script>
+</head>
+
+<body class="bg-zinc-950 text-zinc-300 antialiased">
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        <span data-lang="sv">Ett oväntat fel har uppstått.</span>
+        <span data-lang="en">An unexpected error has occurred.</span>
+        <a href="." class="reload underline">
+            <span data-lang="sv">Ladda om</span>
+            <span data-lang="en">Reload</span>
+        </a>
+        <span class="dismiss">&#128473;</span>
+    </div>
+
+    <script src="js/clipboard.js"></script>
+    <script src="js/ui.js"></script>
+    <!-- autostart="false" så att vi kan skicka in applicationCulture (laddar rätt satellit-assemblies och ICU-data) -->
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js" autostart="false"></script>
+    <script>
+        Blazor.start({ applicationCulture: window.devteam.getLanguage() });
+    </script>
+</body>
+
+</html>

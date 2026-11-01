@@ -1,0 +1,13 @@
+bin/
+obj/
+publish/
+.vs/
+*.user
+node_modules/
+
+# Genereras av Tailwind CLI vid bygget (se DevTeam.Web.csproj)
+DevTeam.Web/wwwroot/css/tailwind.css
+
+# Lokala hemligheter
+appsettings.*.local.json
+.env

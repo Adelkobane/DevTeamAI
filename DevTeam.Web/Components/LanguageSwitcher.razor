@@ -1,0 +1,39 @@
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IStringLocalizer<Strings> L
+
+@* SV | EN-växlare. Valet sparas i localStorage och sidan laddas om så att rätt kultur och satellit-assemblies laddas. *@
+<div class="inline-flex items-center rounded-lg border border-white/10 bg-white/5 p-0.5 text-xs font-semibold backdrop-blur-md"
+     role="group" aria-label="@L["Lang.Label"]">
+    <button type="button" lang="sv" title="@L["Lang.SwitchToSv"]"
+            aria-pressed="@(IsActive("sv") ? "true" : "false")"
+            @onclick='() => SwitchAsync("sv")'
+            class="rounded-md px-2.5 py-1.5 tracking-wider transition-all duration-300 @(IsActive("sv") ? ActiveClasses : InactiveClasses)">
+        SV
+    </button>
+    <button type="button" lang="en" title="@L["Lang.SwitchToEn"]"
+            aria-pressed="@(IsActive("en") ? "true" : "false")"
+            @onclick='() => SwitchAsync("en")'
+            class="rounded-md px-2.5 py-1.5 tracking-wider transition-all duration-300 @(IsActive("en") ? ActiveClasses : InactiveClasses)">
+        EN
+    </button>
+</div>
+
+@code {
+    private const string ActiveClasses = "bg-linear-to-r from-cyan-400/90 to-purple-500/90 text-white shadow-[0_0_14px_-2px] shadow-cyan-400/60";
+    private const string InactiveClasses = "text-zinc-400 hover:text-white";
+
+    private static string CurrentLanguage => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private static bool IsActive(string language) => CurrentLanguage == language;
+
+    private async Task SwitchAsync(string language)
+    {
+        if (IsActive(language)) return;
+
+        await JS.InvokeVoidAsync("devteam.setLanguage", language);
+
+        // Ladda om så att Blazor startar om med den nya kulturen (och hämtar texter från API:et på rätt språk).
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}

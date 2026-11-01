@@ -1,0 +1,47 @@
+@inherits LayoutComponentBase
+@inject IStringLocalizer<Strings> L
+@inject NavigationManager Navigation
+
+@* Dekorativ bakgrund: mjuka neon-glöd och ett subtilt rutnät *@
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-48 left-1/4 h-[34rem] w-[34rem] rounded-full bg-cyan-500/20 blur-[130px]"></div>
+    <div class="absolute top-1/3 -right-48 h-[38rem] w-[38rem] rounded-full bg-purple-600/20 blur-[150px]"></div>
+    <div class="absolute -bottom-40 -left-48 h-[34rem] w-[34rem] rounded-full bg-blue-600/15 blur-[140px]"></div>
+    <div class="bg-grid absolute inset-0"></div>
+</div>
+
+<div class="flex min-h-screen flex-col">
+    <header class="sticky top-0 z-20 border-b border-white/10 bg-zinc-950/60 backdrop-blur-md">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <a href="@Navigation.AnchorHref()" class="group flex items-center gap-2.5 text-lg font-bold tracking-tight text-white">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-cyan-400 via-blue-500 to-purple-500 text-sm font-black text-white shadow-lg shadow-cyan-500/30 transition-transform duration-300 group-hover:rotate-6">&lt;/&gt;</span>
+                DevTeam
+            </a>
+            <nav class="flex items-center gap-1 text-sm font-medium text-zinc-400 sm:gap-2" aria-label="@L["Nav.Menu"]">
+                <a href="@Navigation.AnchorHref("appbyggare")" class="hidden rounded-lg px-3 py-2 transition hover:bg-white/5 hover:text-white md:inline-flex">@L["Nav.Builder"]</a>
+                <a href="@Navigation.AnchorHref("profiler")" class="hidden rounded-lg px-3 py-2 transition hover:bg-white/5 hover:text-white sm:inline-flex">@L["Nav.Team"]</a>
+                <a href="@Navigation.AnchorHref("projekt")" class="hidden rounded-lg px-3 py-2 transition hover:bg-white/5 hover:text-white sm:inline-flex">@L["Nav.Projects"]</a>
+                <a href="@Navigation.AnchorHref("kontakt")" class="rounded-lg bg-white/10 px-4 py-2 text-white ring-1 ring-white/15 transition hover:bg-white/15 hover:ring-cyan-400/50 sm:ml-1">@L["Nav.Contact"]</a>
+                <LanguageSwitcher />
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        @Body
+    </main>
+
+    <footer class="border-t border-white/10 bg-zinc-950/60 py-10 backdrop-blur-md">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm sm:flex-row">
+            <p class="text-zinc-400">&copy; @DateTime.Now.Year Adel Kobansson · DevTeam AI</p>
+            <p class="text-zinc-500">
+                @L["Footer.BuiltWith"] <span class="text-cyan-300">Modern .NET</span>,
+                <span class="text-purple-300">Blazor WebAssembly</span> &amp;
+                <span class="text-blue-300">Tailwind CSS</span>
+            </p>
+        </div>
+    </footer>
+</div>
+
+@* DevTeam AI: flytande assistent (chatt + jobbmatchning) *@
+<AiAssistantWidget />

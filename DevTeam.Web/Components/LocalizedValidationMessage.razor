@@ -1,0 +1,61 @@
+@using System.Linq.Expressions
+@implements IDisposable
+@inject IStringLocalizer<Strings> L
+
+@* Visar valideringsfel för ett fält och översätter resursnycklarna i DataAnnotations-meddelandena. *@
+@foreach (var message in Messages)
+{
+    <div class="@CssClass">@Translate(message)</div>
+}
+
+@code {
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    [Parameter, EditorRequired] public Expression<Func<object?>> For { get; set; } = default!;
+    [Parameter] public string? CssClass { get; set; }
+
+    private EditContext? _subscribedContext;
+    private FieldIdentifier _field;
+
+    private IEnumerable<string> Messages =>
+        EditContext is null ? [] : EditContext.GetValidationMessages(_field);
+
+    protected override void OnParametersSet()
+    {
+        if (EditContext is null)
+        {
+            throw new InvalidOperationException($"{nameof(LocalizedValidationMessage)} måste ligga inom en EditForm.");
+        }
+
+        _field = FieldIdentifier.Create(For);
+
+        if (!ReferenceEquals(_subscribedContext, EditContext))
+        {
+            if (_subscribedContext is not null)
+            {
+                _subscribedContext.OnValidationStateChanged -= HandleValidationStateChanged;
+            }
+
+            EditContext.OnValidationStateChanged += HandleValidationStateChanged;
+            _subscribedContext = EditContext;
+        }
+    }
+
+    private void HandleValidationStateChanged(object? sender, ValidationStateChangedEventArgs e) =>
+        StateHasChanged();
+
+    // Okända nycklar (t.ex. ett annat serverfel) visas som de är.
+    private string Translate(string key)
+    {
+        var value = L[key];
+        return value.ResourceNotFound ? key : value.Value;
+    }
+
+    public void Dispose()
+    {
+        if (_subscribedContext is not null)
+        {
+            _subscribedContext.OnValidationStateChanged -= HandleValidationStateChanged;
+        }
+    }
+}

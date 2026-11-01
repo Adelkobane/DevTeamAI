@@ -1,0 +1,213 @@
+@using DevTeam.Web.Models
+@implements IDisposable
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> L
+
+@* Ett kontaktkort per utvecklare: e-post (mailto + kopiera), telefon (tel:) samt LinkedIn och GitHub.
+   Tomma fält döljs. Kopieringsstatus hanteras per kort. *@
+<article class="glow-surface accent-@Accent rounded-xl border border-white/10 bg-zinc-950/50 p-3.5 transition-colors duration-300 sm:p-4" aria-label="@Profile.Name">
+    <header class="flex items-center gap-3">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl p-[1.5px]" style="background: linear-gradient(135deg, rgb(var(--glow)), rgb(59 130 246 / 0.6), rgb(168 85 247 / 0.8)); box-shadow: 0 0 20px -6px rgb(var(--glow) / 0.8)">
+            <div class="flex h-full w-full items-center justify-center rounded-[10px] bg-zinc-950 text-sm font-bold" style="color: rgb(var(--glow-text))" aria-hidden="true">@Initials</div>
+        </div>
+        <div class="min-w-0">
+            <h4 class="truncate text-base font-semibold text-white">@Profile.Name</h4>
+            @if (!string.IsNullOrWhiteSpace(Profile.Title))
+            {
+                <p class="truncate text-xs font-medium" style="color: rgb(var(--glow-text))">@Profile.Title</p>
+            }
+        </div>
+    </header>
+
+    @if (HasEmail || HasPhone)
+    {
+        <ul class="mt-4 space-y-1.5">
+            @if (HasEmail)
+            {
+                <li>
+                    <a href="mailto:@Profile.Email"
+                       class="group flex min-w-0 items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition hover:bg-white/5 sm:gap-3 sm:px-2"
+                       aria-label="@L["Contact.EmailAria", Profile.Name]">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-cyan-300 transition group-hover:border-cyan-400/50 group-hover:shadow-[0_0_16px_-4px] group-hover:shadow-cyan-400/60">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">@L["Contact.EmailLabel"]</span>
+                            <span class="block break-all text-[13px] font-medium text-zinc-100 transition group-hover:text-cyan-300 sm:text-sm">@Profile.Email</span>
+                        </span>
+                    </a>
+
+                    @* Under adressen, indragen till textkolumnen, så att långa adresser får full bredd. *@
+                    <button type="button" @onclick="CopyEmailAsync"
+                            aria-label="@L["Contact.CopyEmailAria", Profile.Name]"
+                            class="ml-12 mt-1 flex h-7 sm:ml-[3.25rem] items-center justify-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-all duration-300 @CopyClasses">
+                        @if (_copyState == CopyState.Copied)
+                        {
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.75l6 6 9-13.5" /></svg>
+                            <span>@L["Contact.Copied"]</span>
+                        }
+                        else if (_copyState == CopyState.Failed)
+                        {
+                            <span>@L["Contact.CopyFailed"]</span>
+                        }
+                        else
+                        {
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                            </svg>
+                            <span>@L["Contact.CopyEmail"]</span>
+                        }
+                    </button>
+                    <span class="sr-only" role="status" aria-live="polite">@(_copyState == CopyState.Copied ? L["Contact.CopiedAnnounce"].Value : "")</span>
+                </li>
+            }
+
+            @if (HasPhone)
+            {
+                <li>
+                    <a href="tel:@PhoneHref"
+                       class="group flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition hover:bg-white/5 sm:gap-3 sm:px-2"
+                       aria-label="@L["Contact.CallAria", Profile.Name, PhoneDisplay]">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-emerald-300 transition group-hover:border-emerald-400/50 group-hover:shadow-[0_0_16px_-4px] group-hover:shadow-emerald-400/60">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                            </svg>
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">@L["Contact.PhoneLabel"]</span>
+                            <span class="block text-sm font-medium text-zinc-100 transition group-hover:text-emerald-300">@PhoneDisplay</span>
+                        </span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (HasLinkedIn || HasGitHub)
+    {
+        <div class="mt-3 flex flex-wrap gap-2">
+            @if (HasLinkedIn)
+            {
+                <a href="@Profile.LinkedInUrl" target="_blank" rel="noopener noreferrer"
+                   aria-label="@L["Profile.LinkedInAria", Profile.Name]"
+                   class="btn btn-glass min-w-[7rem] flex-1 !py-2 text-sm hover:!border-[#0A66C2]/70 hover:shadow-[0_0_24px_-4px] hover:shadow-[#0A66C2]/60">
+                    <LinkedInIcon CssClass="h-4 w-4 text-[#0A66C2] brightness-125" />
+                    LinkedIn
+                </a>
+            }
+            @if (HasGitHub)
+            {
+                <a href="@Profile.GitHubUrl" target="_blank" rel="noopener noreferrer"
+                   aria-label="@L["Profile.GitHubAria", Profile.Name]"
+                   class="btn btn-glass min-w-[7rem] flex-1 !py-2 text-sm hover:!border-white/60 hover:shadow-[0_0_24px_-4px] hover:shadow-white/40">
+                    <GitHubIcon CssClass="h-4 w-4" />
+                    GitHub
+                </a>
+            }
+        </div>
+    }
+</article>
+
+@code {
+    private enum CopyState { Idle, Copied, Failed }
+
+    [Parameter, EditorRequired] public DeveloperProfile Profile { get; set; } = default!;
+
+    /// <summary>cyan | purple | blue | green</summary>
+    [Parameter] public string Accent { get; set; } = "cyan";
+
+    private CopyState _copyState = CopyState.Idle;
+    private CancellationTokenSource? _copyResetCts;
+
+    private bool HasEmail => !string.IsNullOrWhiteSpace(Profile.Email);
+    private bool HasPhone => !string.IsNullOrWhiteSpace(Profile.Phone);
+    private bool HasLinkedIn => !string.IsNullOrWhiteSpace(Profile.LinkedInUrl);
+    private bool HasGitHub => !string.IsNullOrWhiteSpace(Profile.GitHubUrl);
+
+    private string CopyClasses => _copyState switch
+    {
+        CopyState.Copied => "border-emerald-400/60 bg-emerald-400/15 text-emerald-200 shadow-[0_0_24px_-4px] shadow-emerald-400/60",
+        CopyState.Failed => "border-red-400/50 bg-red-400/10 text-red-200",
+        _ => "border-white/10 bg-white/5 text-zinc-300 hover:border-white/30 hover:bg-white/10 hover:text-white"
+    };
+
+    private string Initials
+    {
+        get
+        {
+            var parts = Profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return parts.Length switch
+            {
+                0 => "?",
+                1 => parts[0][..1].ToUpperInvariant(),
+                _ => string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant()
+            };
+        }
+    }
+
+    private string Digits => new(Profile.Phone.Where(c => char.IsDigit(c) || c == '+').ToArray());
+
+    /// <summary>Svenska mobilnummer visas som 072-038 82 38; andra format visas som de är angivna.</summary>
+    private string PhoneDisplay
+    {
+        get
+        {
+            var d = Digits;
+            return d.Length == 10 && d.StartsWith("07", StringComparison.Ordinal)
+                ? $"{d[..3]}-{d[3..6]} {d[6..8]} {d[8..]}"
+                : Profile.Phone.Trim();
+        }
+    }
+
+    /// <summary>tel:-länkar fungerar bäst i internationellt format (0720388238 → +46720388238).</summary>
+    private string PhoneHref
+    {
+        get
+        {
+            var d = Digits;
+            return d.StartsWith('0') ? "+46" + d[1..] : d;
+        }
+    }
+
+    private async Task CopyEmailAsync()
+    {
+        if (!HasEmail) return;
+
+        try
+        {
+            // Se wwwroot/js/clipboard.js (Clipboard API med reservmetod).
+            var copied = await JS.InvokeAsync<bool>("devteam.copyText", Profile.Email);
+            _copyState = copied ? CopyState.Copied : CopyState.Failed;
+        }
+        catch (JSException)
+        {
+            _copyState = CopyState.Failed;
+        }
+
+        // Återställ knappen efter en stund (avbryt tidigare timer vid snabba klick).
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+        _copyResetCts = new CancellationTokenSource();
+        var token = _copyResetCts.Token;
+
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(2000, token);
+            _copyState = CopyState.Idle;
+        }
+        catch (TaskCanceledException)
+        {
+            // En nyare kopiering tog över.
+        }
+    }
+
+    public void Dispose()
+    {
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+    }
+}

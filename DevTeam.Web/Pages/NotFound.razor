@@ -1,0 +1,12 @@
+﻿@page "/not-found"
+@layout MainLayout
+@inject IStringLocalizer<Strings> L
+
+<PageTitle>@L["NotFound.Title"]</PageTitle>
+
+<div class="mx-auto max-w-xl px-6 py-32 text-center">
+    <p class="text-gradient text-8xl font-extrabold">404</p>
+    <h1 class="mt-4 text-2xl font-bold text-white">@L["NotFound.Title"]</h1>
+    <p class="mt-2 text-zinc-400">@L["NotFound.Text"]</p>
+    <a href="" class="btn btn-gradient mt-8">@L["NotFound.Home"]</a>
+</div>

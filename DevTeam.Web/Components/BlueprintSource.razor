@@ -1,0 +1,133 @@
+@using DevTeam.Web.Models
+@using DevTeam.Web.Services
+@implements IDisposable
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> L
+
+@* Flik: den genererade HTML-koden, färglagd och kopierbar. *@
+<div>
+    @if (string.IsNullOrWhiteSpace(Spec.PreviewHtml))
+    {
+        <p class="text-sm text-zinc-400">@L["Builder.Preview.EmptySource"]</p>
+    }
+    else
+    {
+        <div class="overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-xl shadow-black/40">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-white/[0.03] px-3 py-2.5 sm:px-4">
+                <span class="flex min-w-0 items-center gap-2">
+                    <span class="flex shrink-0 gap-1.5" aria-hidden="true">
+                        <span class="h-2.5 w-2.5 rounded-full bg-red-400/80"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-300/80"></span>
+                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-400/80"></span>
+                    </span>
+                    <span class="truncate font-mono text-xs text-zinc-400">@FileName</span>
+                </span>
+                <span class="flex flex-wrap gap-2">
+                    <button type="button" @onclick="CopyAsync" class="btn btn-glass !px-3 !py-1.5 !text-xs">
+                        @(_copy switch { CopyState.Copied => L["Builder.Source.Copied"], CopyState.Failed => L["Builder.Source.CopyFailed"], _ => L["Builder.Source.Copy"] })
+                    </button>
+                    <button type="button" @onclick="DownloadAsync" class="btn btn-glass !px-3 !py-1.5 !text-xs">
+                        <span aria-hidden="true">📥</span> @L["Builder.Preview.Download"]
+                    </button>
+                </span>
+            </div>
+            <span class="sr-only" role="status">@(_copy == CopyState.Copied ? L["Builder.Source.Copied"].Value : "")</span>
+
+            <div class="code-editor max-h-[36rem] overflow-auto p-4" tabindex="0" aria-label="@L["Builder.Tab.Source"]">
+                @foreach (var line in _lines)
+                {
+                    <div class="flex whitespace-pre" @key="line.Number">
+                        <span class="code-gutter" aria-hidden="true">@line.Number</span>
+                        <span class="min-w-0 flex-1">
+                            @if (line.Spans.Count == 0)
+                            {
+                                <span class="code-text"> </span>
+                            }
+                            else
+                            {
+                                @foreach (var span in line.Spans)
+                                {
+                                    <span class="@ClassFor(span.Kind)">@span.Text</span>
+                                }
+                            }
+                        </span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private enum CopyState { Idle, Copied, Failed }
+
+    [Parameter, EditorRequired] public AppSpec Spec { get; set; } = new();
+
+    private string? _source;
+    private IReadOnlyList<HtmlLine> _lines = [];
+    private CopyState _copy = CopyState.Idle;
+    private CancellationTokenSource? _copyResetCts;
+
+    private string FileName => HtmlSyntax.FileName(Spec.Title);
+
+    protected override void OnParametersSet()
+    {
+        if (Spec.PreviewHtml == _source) return;
+        _source = Spec.PreviewHtml;
+        _lines = HtmlSyntax.Highlight(Spec.PreviewHtml);
+    }
+
+    private static string ClassFor(HtmlSpanKind kind) => kind switch
+    {
+        HtmlSpanKind.Name => "code-name",
+        HtmlSpanKind.Attr => "code-attr",
+        HtmlSpanKind.Value => "code-value",
+        HtmlSpanKind.Comment => "code-comment",
+        HtmlSpanKind.Punct => "code-punct",
+        _ => "code-text"
+    };
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            _copy = await JS.InvokeAsync<bool>("devteam.copyText", Spec.PreviewHtml) ? CopyState.Copied : CopyState.Failed;
+        }
+        catch (JSException)
+        {
+            _copy = CopyState.Failed;
+        }
+
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+        _copyResetCts = new CancellationTokenSource();
+        var token = _copyResetCts.Token;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(2200, token);
+            _copy = CopyState.Idle;
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    private async Task DownloadAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("devteam.downloadText", FileName, Spec.PreviewHtml);
+        }
+        catch (Exception ex) when (ex is JSException or InvalidOperationException or TaskCanceledException)
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+    }
+}

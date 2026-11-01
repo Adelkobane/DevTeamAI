@@ -1,0 +1,14 @@
+<div class="mx-auto max-w-2xl text-center" data-reveal>
+    <span class="inline-block rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">@Eyebrow</span>
+    <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">@Title</h2>
+    @if (!string.IsNullOrWhiteSpace(Subtitle))
+    {
+        <p class="mt-4 text-lg leading-relaxed text-zinc-400">@Subtitle</p>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Eyebrow { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+}

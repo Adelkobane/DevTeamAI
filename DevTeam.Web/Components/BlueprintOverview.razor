@@ -1,0 +1,93 @@
+@using DevTeam.Web.Models
+@inject IStringLocalizer<Strings> L
+
+@* Flik 1: Översikt & Offert – sammanfattning, nyckelfunktioner och en indikativ tidsplan. *@
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-5 lg:gap-8">
+    <div class="space-y-6 lg:col-span-3">
+        <article class="glass-card accent-cyan p-5 sm:p-6">
+            <h4 class="group-label">@L["Builder.Overview.Summary"]</h4>
+            <p class="mt-1 leading-relaxed text-zinc-200">@Spec.Summary</p>
+        </article>
+
+        <section aria-labelledby="bp-stories">
+            <h4 id="bp-stories" class="group-label">@L["Builder.Overview.Stories"]</h4>
+            <ol class="mt-3 space-y-3">
+                @for (var i = 0; i < Spec.UserStories.Count; i++)
+                {
+                    <li class="glass-card @AccentFor(i) flex gap-4 p-4">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm font-bold text-white shadow-[0_0_16px_-4px] shadow-cyan-400/50" aria-hidden="true">@(i + 1)</span>
+                        <span class="text-sm leading-relaxed text-zinc-300 sm:text-base">@Spec.UserStories[i]</span>
+                    </li>
+                }
+            </ol>
+        </section>
+    </div>
+
+    @* Tidsplan *@
+    <section class="lg:col-span-2" aria-labelledby="bp-timeline">
+        <div class="glass-card accent-purple p-5 sm:p-6">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <h4 id="bp-timeline" class="group-label !mb-0">@L["Builder.Overview.Timeline"]</h4>
+                <span class="rounded-full border border-purple-400/40 bg-purple-400/10 px-3 py-1 text-xs font-semibold text-purple-100 shadow-[0_0_18px_-4px] shadow-purple-400/60">
+                    @L["Builder.Overview.Total", Spec.TotalWeeks]
+                </span>
+            </div>
+
+            <ol class="relative mt-6 space-y-6 border-l border-white/10 pl-6">
+                @{
+                    var elapsed = 0;
+                    var total = Math.Max(Spec.TotalWeeks, 1);
+                }
+                @foreach (var sprint in Spec.EstimatedTimeline)
+                {
+                    var firstWeek = elapsed + 1;
+                    var lastWeek = elapsed + sprint.Weeks;
+                    var width = Math.Max(8, (int)Math.Round(sprint.Weeks * 100.0 / total));
+                    elapsed = lastWeek;
+
+                    <li class="relative">
+                        <span class="absolute -left-[1.95rem] top-1 h-3 w-3 rounded-full border-2 border-zinc-950 bg-linear-to-br from-cyan-300 to-purple-400 shadow-[0_0_12px] shadow-cyan-400/80" aria-hidden="true"></span>
+                        <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+                            <h5 class="font-semibold text-white">@sprint.Name</h5>
+                            <span class="text-xs font-medium text-cyan-300">@(firstWeek == lastWeek ? L["Builder.Overview.Week", firstWeek].Value : L["Builder.Overview.WeekRange", firstWeek, lastWeek].Value)</span>
+                        </div>
+                        <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5" aria-hidden="true">
+                            <div class="h-full rounded-full bg-linear-to-r from-cyan-400 to-purple-500" style="width:@(width)%"></div>
+                        </div>
+                        @if (sprint.Goals.Count > 0)
+                        {
+                            <ul class="mt-3 space-y-1.5 text-sm text-zinc-400">
+                                @foreach (var goal in sprint.Goals)
+                                {
+                                    <li class="flex gap-2"><span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-zinc-500" aria-hidden="true"></span><span>@goal</span></li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ol>
+
+            <p class="mt-6 rounded-xl border border-amber-300/20 bg-amber-300/5 px-3.5 py-3 text-xs leading-relaxed text-amber-100/80">
+                @L["Builder.Overview.Indicative"]
+            </p>
+
+            <button type="button" @onclick="OnBook" class="btn btn-gradient mt-5 w-full">
+                <span aria-hidden="true">🚀</span> @L["Builder.Overview.Cta"]
+            </button>
+        </div>
+    </section>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public AppSpec Spec { get; set; } = default!;
+
+    /// <summary>Besökaren vill gå vidare till "Kontakta Adel".</summary>
+    [Parameter] public EventCallback OnBook { get; set; }
+
+    private static string AccentFor(int index) => (index % 3) switch
+    {
+        0 => "accent-cyan",
+        1 => "accent-purple",
+        _ => "accent-blue"
+    };
+}

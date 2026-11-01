@@ -1,0 +1,189 @@
+@using System.Text
+@using DevTeam.Web.Models
+@inject IStringLocalizer<Strings> L
+
+@* Flik 3: Prototyp-skiss – en klickbar wireframe av appens huvudvyer, byggd av komponenterna AI:n föreslog. *@
+<div>
+    <p class="mb-4 text-sm text-zinc-400">@L["Builder.Proto.Hint"]</p>
+
+    @if (Current is not null)
+    {
+        <div class="glow-surface relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 shadow-xl shadow-black/40">
+
+            @* Webbläsarram *@
+            <div class="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-2.5" aria-hidden="true">
+                <span class="flex gap-1.5">
+                    <span class="h-2.5 w-2.5 rounded-full bg-red-400/70"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-amber-300/70"></span>
+                    <span class="h-2.5 w-2.5 rounded-full bg-emerald-400/70"></span>
+                </span>
+                <span class="min-w-0 flex-1 truncate rounded-md bg-black/30 px-3 py-1 text-center font-mono text-[11px] text-zinc-500">
+                    @($"{Slug(Spec.Title)}.app/{Slug(Current.Name)}")
+                </span>
+            </div>
+
+            <div class="grid md:grid-cols-[13.5rem_minmax(0,1fr)]">
+
+                @* Appens navigation: en knapp per vy *@
+                <nav aria-label="@L["Builder.Proto.Nav"]"
+                     class="flex gap-2 overflow-x-auto border-b border-white/10 bg-white/[0.02] p-3 md:flex-col md:gap-1.5 md:border-b-0 md:border-r md:p-4">
+                    <div class="hidden items-center gap-2.5 pb-3 md:flex" aria-hidden="true">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-cyan-400 via-blue-500 to-purple-500 text-sm font-black text-white">@Initial</span>
+                        <span class="truncate text-sm font-bold text-white">@Spec.Title</span>
+                    </div>
+
+                    @for (var i = 0; i < Spec.UiComponents.Count; i++)
+                    {
+                        var index = i;
+                        var active = index == _current;
+                        <button type="button" @onclick="() => _current = index" aria-current="@(active ? "page" : null)"
+                                class="flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium transition-all duration-300 @(active ? "bg-cyan-400/15 text-white ring-1 ring-cyan-400/40 shadow-[0_0_20px_-6px] shadow-cyan-400/60" : "text-zinc-400 hover:bg-white/5 hover:text-white")">
+                            <span class="h-1.5 w-1.5 shrink-0 rounded-full @(active ? "bg-cyan-300" : "bg-zinc-600")" aria-hidden="true"></span>
+                            <span class="whitespace-nowrap md:whitespace-normal">@Spec.UiComponents[index].Name</span>
+                        </button>
+                    }
+                </nav>
+
+                @* Vyns innehåll *@
+                <div class="min-w-0 p-4 sm:p-6" aria-live="polite">
+                    <h4 class="text-xl font-bold text-white">@Current.Name</h4>
+                    <p class="mt-1 text-sm text-zinc-400">@Current.Purpose</p>
+
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                        @foreach (var component in Current.Components)
+                        {
+                            var kind = Classify(component);
+                            <figure class="@(IsWide(kind) ? "sm:col-span-2" : "") group rounded-xl border border-white/10 bg-white/[0.03] p-3.5 transition-all duration-300 hover:border-cyan-400/40 hover:bg-white/[0.06]">
+                                <div aria-hidden="true">
+                                    @switch (kind)
+                                    {
+                                        case Wire.Chart:
+                                            <div class="flex h-24 items-end gap-2 rounded-lg bg-black/20 p-3">
+                                                @foreach (var h in ChartBars)
+                                                {
+                                                    <div class="flex-1 rounded-t bg-linear-to-t from-cyan-500/40 to-purple-400/80 transition-all duration-500 group-hover:from-cyan-400/60" style="height:@(h)%"></div>
+                                                }
+                                            </div>
+                                            break;
+
+                                        case Wire.Calendar:
+                                            <div class="grid grid-cols-7 gap-1.5 rounded-lg bg-black/20 p-3">
+                                                @for (var c = 0; c < 21; c++)
+                                                {
+                                                    <div class="h-4 rounded @(c % 5 == 2 ? "bg-cyan-400/50 shadow-[0_0_10px] shadow-cyan-400/40" : (c % 7 == 0 || c % 7 == 6 ? "bg-white/[0.04]" : "bg-white/10"))"></div>
+                                                }
+                                            </div>
+                                            break;
+
+                                        case Wire.Table:
+                                            <div class="space-y-1.5 rounded-lg bg-black/20 p-3">
+                                                <div class="grid grid-cols-3 gap-2"><div class="h-2 rounded bg-white/25"></div><div class="h-2 rounded bg-white/25"></div><div class="h-2 rounded bg-white/25"></div></div>
+                                                @for (var r = 0; r < 3; r++)
+                                                {
+                                                    <div class="grid grid-cols-3 gap-2 border-t border-white/5 pt-1.5"><div class="h-2 rounded bg-white/10"></div><div class="h-2 rounded bg-white/10"></div><div class="h-2 w-2/3 rounded bg-cyan-400/30"></div></div>
+                                                }
+                                            </div>
+                                            break;
+
+                                        case Wire.Form:
+                                            <div class="space-y-2 rounded-lg bg-black/20 p-3">
+                                                <div class="h-6 rounded-md border border-white/15"></div>
+                                                <div class="h-6 rounded-md border border-white/15"></div>
+                                                <div class="h-6 w-1/3 rounded-md bg-linear-to-r from-cyan-400/70 to-purple-500/70"></div>
+                                            </div>
+                                            break;
+
+                                        case Wire.Cards:
+                                            <div class="grid grid-cols-3 gap-2 rounded-lg bg-black/20 p-3">
+                                                @for (var k = 0; k < 3; k++)
+                                                {
+                                                    <div class="space-y-1.5 rounded-md border border-white/10 p-1.5">
+                                                        <div class="h-9 rounded bg-linear-to-br from-cyan-400/25 to-purple-500/30"></div>
+                                                        <div class="h-1.5 rounded bg-white/15"></div>
+                                                        <div class="h-1.5 w-2/3 rounded bg-white/10"></div>
+                                                    </div>
+                                                }
+                                            </div>
+                                            break;
+
+                                        case Wire.Actions:
+                                            <div class="flex flex-wrap items-center gap-2 rounded-lg bg-black/20 p-3">
+                                                <div class="h-7 w-24 rounded-lg bg-linear-to-r from-cyan-400/70 to-purple-500/70"></div>
+                                                <div class="h-7 w-20 rounded-lg border border-white/20"></div>
+                                                <div class="h-5 w-5 rounded-full bg-emerald-400/50"></div>
+                                            </div>
+                                            break;
+
+                                        default:
+                                            <div class="space-y-2 rounded-lg bg-black/20 p-3">
+                                                <div class="h-2 w-full rounded bg-white/15"></div>
+                                                <div class="h-2 w-5/6 rounded bg-white/10"></div>
+                                                <div class="h-2 w-2/3 rounded bg-white/10"></div>
+                                            </div>
+                                            break;
+                                    }
+                                </div>
+                                <figcaption class="mt-2.5 text-xs leading-snug text-zinc-300">@component</figcaption>
+                            </figure>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private enum Wire { Generic, Chart, Calendar, Table, Form, Cards, Actions }
+
+    private static readonly int[] ChartBars = [38, 64, 50, 82, 58, 94];
+
+    [Parameter, EditorRequired] public AppSpec Spec { get; set; } = default!;
+
+    private int _current;
+
+    private SpecScreen? Current => Spec.UiComponents.Count == 0 ? null : Spec.UiComponents[Math.Clamp(_current, 0, Spec.UiComponents.Count - 1)];
+
+    private string Initial => string.IsNullOrWhiteSpace(Spec.Title) ? "A" : Spec.Title.Trim()[..1].ToUpperInvariant();
+
+    private static bool IsWide(Wire kind) => kind is Wire.Chart or Wire.Calendar or Wire.Table;
+
+    // Nyckelord som börjar med mellanslag matchas bara i början av ett ord (" form" träffar "formulär" men inte "plattform").
+    private static readonly (Wire Kind, string[] Keywords)[] Rules =
+    [
+        (Wire.Calendar, ["kalender", "calendar", "schema", "schedule", "tidslucka", "tidsväljare", "time slot", "timeslot", "time picker", "datumväljare", "date picker", "veckovy", "weekly view"]),
+        (Wire.Chart, ["graf", "chart", "statistik", "statistic", "dashboard", "analys", "analytic", "diagram", "rapport", " report", " kpi", "intäkt", "revenue"]),
+        (Wire.Cards, [" kort", " card", "produktkort", "produktlista", "product list", "galleri", "gallery", "katalog", "catalog", " bild", " image", "karusell", "carousel", " grid"]),
+        (Wire.Form, [" form", "betalning", "payment", "kassa", "checkout", "inmatning", " input", "inlogg", " login", "registrer", " sök", " search", " filter", "inställning", " setting"]),
+        (Wire.Actions, ["knapp", "button", " cta", " modal", " dialog", "notis", "notification", " status", "indikator", " badge"]),
+        (Wire.Table, ["tabell", " table", " lista", " list", "historik", "history", "översikt", "overview", " logg", " log ", "inkorg", " inbox", "bokningar", "orders", "beställning"])
+    ];
+    /// <summary>Gissar vilken sorts gränssnittselement en komponentbeskrivning avser, för att kunna rita en passande wireframe.</summary>
+    private static Wire Classify(string component)
+    {
+        var text = " " + component.ToLowerInvariant() + " ";
+
+        foreach (var (kind, keywords) in Rules)
+        {
+            if (keywords.Any(text.Contains)) return kind;
+        }
+
+        return Wire.Generic;
+    }
+
+    /// <summary>Gör en titel till en URL-lik text (bara a–z, 0–9 och bindestreck) för adressfältet i skissen.</summary>
+    private static string Slug(string value)
+    {
+        var sb = new StringBuilder();
+        foreach (var c in value.ToLowerInvariant())
+        {
+            if (c is >= 'a' and <= 'z' or >= '0' and <= '9') sb.Append(c);
+            else if (c == 'å' || c == 'ä') sb.Append('a');
+            else if (c == 'ö') sb.Append('o');
+            else if (sb.Length > 0 && sb[^1] != '-') sb.Append('-');
+        }
+
+        var slug = sb.ToString().Trim('-');
+        return slug.Length == 0 ? "app" : slug;
+    }
+}

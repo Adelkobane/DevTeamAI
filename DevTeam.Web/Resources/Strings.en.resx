@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Navigation & layout -->
+  <data name="Nav.Menu" xml:space="preserve"><value>Main menu</value></data>
+  <data name="Nav.Team" xml:space="preserve"><value>Founder</value></data>
+  <data name="Nav.Projects" xml:space="preserve"><value>Product</value></data>
+  <data name="Nav.Contact" xml:space="preserve"><value>Contact</value></data>
+  <data name="Lang.Label" xml:space="preserve"><value>Language</value></data>
+  <data name="Lang.SwitchToSv" xml:space="preserve"><value>Switch to Swedish</value></data>
+  <data name="Lang.SwitchToEn" xml:space="preserve"><value>Switch to English</value></data>
+  <data name="Footer.BuiltWith" xml:space="preserve"><value>Built with</value></data>
+
+  <!-- Common -->
+  <data name="Common.Retry" xml:space="preserve"><value>Try again</value></data>
+
+  <!-- Hero -->
+  <data name="Hero.Badge" xml:space="preserve"><value>Now taking on new client projects</value></data>
+  <data name="Hero.TitleLead" xml:space="preserve"><value>We build your next application with</value></data>
+  <data name="Hero.TitleHighlight" xml:space="preserve"><value>AI &amp; Modern .NET</value></data>
+  <data name="Hero.IntroAnd" xml:space="preserve"><value></value></data>
+  <data name="Hero.IntroRest" xml:space="preserve"><value>– founder and Lead AI &amp; Solutions Engineer. You describe your idea – we build and deliver your application from the ground up with modern .NET and AI.</value></data>
+  <data name="Hero.CtaContact" xml:space="preserve"><value>Contact Adel</value></data>
+  <data name="Hero.StackLabel" xml:space="preserve"><value>Services and capabilities</value></data>
+
+  <!-- Developer profiles -->
+  <data name="Profiles.Eyebrow" xml:space="preserve"><value>The founder</value></data>
+  <data name="Profiles.Title" xml:space="preserve"><value>Meet the founder behind DevTeam AI</value></data>
+  <data name="Profiles.Subtitle" xml:space="preserve"><value>Adel Kobansson, Lead AI &amp; Solutions Engineer – you describe your idea, he builds and delivers the application from the ground up.</value></data>
+  <data name="Profiles.Loading" xml:space="preserve"><value>Loading profiles</value></data>
+  <data name="Profiles.ErrorTitle" xml:space="preserve"><value>Could not load the profiles</value></data>
+  <data name="Profiles.ErrorHint" xml:space="preserve"><value>Make sure the API is running at {0}.</value></data>
+  <data name="Profiles.Empty" xml:space="preserve"><value>No profiles found.</value></data>
+  <data name="Skills.Frontend" xml:space="preserve"><value>Frontend</value></data>
+  <data name="Skills.Backend" xml:space="preserve"><value>Backend</value></data>
+  <data name="Skills.Cloud" xml:space="preserve"><value>Cloud &amp; DevOps</value></data>
+  <data name="Skills.Quality" xml:space="preserve"><value>Quality &amp; ways of working</value></data>
+
+  <!-- Projects -->
+  <data name="Projects.Eyebrow" xml:space="preserve"><value>The product</value></data>
+  <data name="Projects.Title" xml:space="preserve"><value>DevTeam AI AppBuilder</value></data>
+  <data name="Projects.Subtitle" xml:space="preserve"><value>You describe your idea – we build and deliver your application from the ground up with modern .NET and AI.</value></data>
+  <data name="Projects.Loading" xml:space="preserve"><value>Loading projects</value></data>
+  <data name="Projects.ErrorTitle" xml:space="preserve"><value>Could not load the projects</value></data>
+  <data name="Projects.Empty" xml:space="preserve"><value>No projects to show yet.</value></data>
+  <data name="Projects.FilterLabel" xml:space="preserve"><value>Filter projects by technology</value></data>
+  <data name="Projects.FilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="Projects.Showing" xml:space="preserve"><value>Showing {0} of {1} projects</value></data>
+  <data name="Projects.ShowingWith" xml:space="preserve"><value>Showing {0} of {1} projects with {2}</value></data>
+  <data name="Projects.NoMatch" xml:space="preserve"><value>No projects match the filter.</value></data>
+  <data name="Projects.ScreenshotAlt" xml:space="preserve"><value>Screenshot of {0}</value></data>
+  <data name="Projects.Featured" xml:space="preserve"><value>Our own AI product</value></data>
+  <data name="Projects.TryBuilder" xml:space="preserve"><value>Try the App Builder</value></data>
+  <data name="Projects.GitHub" xml:space="preserve"><value>GitHub</value></data>
+  <data name="Projects.LiveDemo" xml:space="preserve"><value>Live demo</value></data>
+
+  <!-- Contact -->
+  <data name="Contact.Eyebrow" xml:space="preserve"><value>Contact</value></data>
+  <data name="Contact.Title" xml:space="preserve"><value>Tell us about your idea</value></data>
+  <data name="Contact.Subtitle" xml:space="preserve"><value>Have an idea or a project you want to bring to life? Send a message or get in touch directly.</value></data>
+  <data name="Contact.DirectTitle" xml:space="preserve"><value>Direct contact</value></data>
+  <data name="Contact.DirectText" xml:space="preserve"><value>Reach out to Adel directly – email, call or find him on LinkedIn and GitHub.</value></data>
+  <data name="Contact.EmailLabel" xml:space="preserve"><value>Email</value></data>
+  <data name="Contact.EmailAria" xml:space="preserve"><value>Send an email to {0}</value></data>
+  <data name="Contact.PhoneLabel" xml:space="preserve"><value>Phone</value></data>
+  <data name="Contact.CallAria" xml:space="preserve"><value>Call {0} on {1}</value></data>
+  <data name="Contact.CopyEmail" xml:space="preserve"><value>Copy Email</value></data>
+  <data name="Contact.CopyEmailAria" xml:space="preserve"><value>Copy {0}'s email address</value></data>
+  <data name="Contact.Copied" xml:space="preserve"><value>Copied!</value></data>
+  <data name="Contact.CopyFailed" xml:space="preserve"><value>Could not copy</value></data>
+  <data name="Contact.CopiedAnnounce" xml:space="preserve"><value>The email address was copied to the clipboard</value></data>
+  <data name="Profile.GitHubAria" xml:space="preserve"><value>Open {0}'s GitHub profile (opens in a new tab)</value></data>
+  <data name="Profile.LinkedInAria" xml:space="preserve"><value>Open {0}'s LinkedIn profile (opens in a new tab)</value></data>
+  <data name="Contact.Point1" xml:space="preserve"><value>Based in Stockholm</value></data>
+  <data name="Contact.Point2" xml:space="preserve"><value>Taking on new client projects</value></data>
+  <data name="Contact.Point3" xml:space="preserve"><value>We'll get back to you as soon as we can</value></data>
+
+  <!-- System status (hero) -->
+  <data name="Status.Title" xml:space="preserve"><value>System status</value></data>
+  <data name="Status.Checking" xml:space="preserve"><value>Checking…</value></data>
+  <data name="Status.Api.Online" xml:space="preserve"><value>API Online</value></data>
+  <data name="Status.Api.Offline" xml:space="preserve"><value>API Offline</value></data>
+  <data name="Status.Azure.Live" xml:space="preserve"><value>Azure Live</value></data>
+  <data name="Status.Azure.Local" xml:space="preserve"><value>Local environment</value></data>
+  <data name="Status.Ai.Active" xml:space="preserve"><value>AI Model Active</value></data>
+  <data name="Status.Ai.Standby" xml:space="preserve"><value>AI Model Standby</value></data>
+  <data name="Status.Unknown" xml:space="preserve"><value>{0}: unknown</value></data>
+
+  <!-- Contact form -->
+  <data name="Form.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Form.NamePlaceholder" xml:space="preserve"><value>Your name</value></data>
+  <data name="Form.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Form.EmailPlaceholder" xml:space="preserve"><value>name@company.com</value></data>
+  <data name="Form.Message" xml:space="preserve"><value>Message</value></data>
+  <data name="Form.MessagePlaceholder" xml:space="preserve"><value>Describe your idea or project...</value></data>
+  <data name="Form.Submit" xml:space="preserve"><value>Send message</value></data>
+  <data name="Form.Sending" xml:space="preserve"><value>Sending...</value></data>
+  <data name="Form.SuccessTitle" xml:space="preserve"><value>Thanks for your message!</value></data>
+  <data name="Form.SuccessText" xml:space="preserve"><value>We'll be in touch as soon as we can.</value></data>
+  <data name="Form.SendAnother" xml:space="preserve"><value>Send another</value></data>
+  <data name="Form.ErrorBadRequest" xml:space="preserve"><value>The message could not be sent. Please check your details and try again.</value></data>
+  <data name="Form.ErrorTooMany" xml:space="preserve"><value>You have sent too many messages in a short time. Please wait a minute and try again.</value></data>
+  <data name="Form.ErrorServer" xml:space="preserve"><value>Something went wrong on the server. Please try again in a moment.</value></data>
+  <data name="Form.ErrorNetwork" xml:space="preserve"><value>Could not reach the server. Check your connection and try again.</value></data>
+
+  <!-- Validation messages (keys are used in the ContactMessage model) -->
+  <data name="Validation.NameRequired" xml:space="preserve"><value>Name is required.</value></data>
+  <data name="Validation.NameLength" xml:space="preserve"><value>The name can be at most 100 characters.</value></data>
+  <data name="Validation.EmailRequired" xml:space="preserve"><value>Email is required.</value></data>
+  <data name="Validation.EmailInvalid" xml:space="preserve"><value>Enter a valid email address.</value></data>
+  <data name="Validation.EmailLength" xml:space="preserve"><value>The email address can be at most 200 characters.</value></data>
+  <data name="Validation.MessageRequired" xml:space="preserve"><value>Message is required.</value></data>
+  <data name="Validation.MessageLength" xml:space="preserve"><value>The message must be between 10 and 60,000 characters.</value></data>
+
+  <!-- DevTeam AI (assistant) -->
+  <data name="Ai.Title" xml:space="preserve"><value>DevTeam AI</value></data>
+  <data name="Ai.Subtitle" xml:space="preserve"><value>Answers based on the information on this site</value></data>
+  <data name="Ai.Fab" xml:space="preserve"><value>Ask DevTeam AI</value></data>
+  <data name="Ai.Open" xml:space="preserve"><value>Open the AI assistant</value></data>
+  <data name="Ai.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Ai.TabChat" xml:space="preserve"><value>Chat</value></data>
+  <data name="Ai.TabMatch" xml:space="preserve"><value>Match job ad</value></data>
+  <data name="Ai.Welcome" xml:space="preserve"><value>Hi! I'm DevTeam AI. Ask me about Adel Kobansson, the AppBuilder and how we build your application – or try one of the suggestions below.</value></data>
+  <data name="Ai.QuickLabel" xml:space="preserve"><value>Suggested questions</value></data>
+  <data name="Ai.Quick1" xml:space="preserve"><value>What is Adel's core expertise?</value></data>
+  <data name="Ai.Quick2" xml:space="preserve"><value>Tell me about AppBuilder</value></data>
+  <data name="Ai.Quick3" xml:space="preserve"><value>How do you build my app?</value></data>
+  <data name="Ai.Quick4" xml:space="preserve"><value>How can I contact Adel?</value></data>
+  <data name="Ai.InputLabel" xml:space="preserve"><value>Your question</value></data>
+  <data name="Ai.InputPlaceholder" xml:space="preserve"><value>Ask a question...</value></data>
+  <data name="Ai.Send" xml:space="preserve"><value>Send</value></data>
+  <data name="Ai.Stop" xml:space="preserve"><value>Stop the answer</value></data>
+  <data name="Ai.Clear" xml:space="preserve"><value>Clear the chat</value></data>
+  <data name="Ai.You" xml:space="preserve"><value>You</value></data>
+  <data name="Ai.Assistant" xml:space="preserve"><value>DevTeam AI</value></data>
+  <data name="Ai.Typing" xml:space="preserve"><value>DevTeam AI is typing</value></data>
+  <data name="Ai.ErrorRate" xml:space="preserve"><value>You've asked a lot of questions in a short time. Please try again in {0} seconds.</value></data>
+  <data name="Ai.ErrorRateNoTime" xml:space="preserve"><value>You've asked a lot of questions in a short time. Please try again in a moment.</value></data>
+  <data name="Ai.ErrorUnavailable" xml:space="preserve"><value>The AI assistant isn't available right now. Please try again later.</value></data>
+  <data name="Ai.ErrorBad" xml:space="preserve"><value>The text could not be processed. Please check it and try again.</value></data>
+  <data name="Ai.ErrorNetwork" xml:space="preserve"><value>Could not reach the server. Check your connection and try again.</value></data>
+  <data name="Ai.ErrorGeneric" xml:space="preserve"><value>Something went wrong with the AI assistant. Please try again.</value></data>
+  <data name="Ai.Match.Intro" xml:space="preserve"><value>Paste the role description or requirements, and the AI will analyse how well Adel matches the role.</value></data>
+  <data name="Ai.Match.Label" xml:space="preserve"><value>Job ad / requirements</value></data>
+  <data name="Ai.Match.Placeholder" xml:space="preserve"><value>Paste the job ad here...</value></data>
+  <data name="Ai.Match.Counter" xml:space="preserve"><value>{0} / {1} characters</value></data>
+  <data name="Ai.Match.MinHint" xml:space="preserve"><value>At least {0} characters are needed.</value></data>
+  <data name="Ai.Match.Analyze" xml:space="preserve"><value>Analyse match</value></data>
+  <data name="Ai.Match.Analyzing" xml:space="preserve"><value>Analysing...</value></data>
+  <data name="Ai.Match.Score" xml:space="preserve"><value>Match</value></data>
+  <data name="Ai.Match.Verdict.High" xml:space="preserve"><value>Strong match</value></data>
+  <data name="Ai.Match.Verdict.Good" xml:space="preserve"><value>Good match</value></data>
+  <data name="Ai.Match.Verdict.Partial" xml:space="preserve"><value>Partial match</value></data>
+  <data name="Ai.Match.Verdict.Low" xml:space="preserve"><value>Weak match</value></data>
+  <data name="Ai.Match.Strengths" xml:space="preserve"><value>Key strengths</value></data>
+  <data name="Ai.Match.Gaps" xml:space="preserve"><value>Worth noting</value></data>
+  <data name="Ai.Match.Reasoning" xml:space="preserve"><value>Reasoning</value></data>
+  <data name="Ai.Match.Again" xml:space="preserve"><value>New analysis</value></data>
+  <data name="Ai.Match.Disclaimer" xml:space="preserve"><value>AI-generated analysis based on Adel's profile on this site. Always verify important requirements yourself.</value></data>
+
+  <!-- 404 -->
+  <data name="NotFound.Title" xml:space="preserve"><value>Page not found</value></data>
+  <data name="NotFound.Text" xml:space="preserve"><value>The page you are looking for doesn't exist.</value></data>
+  <data name="NotFound.Home" xml:space="preserve"><value>Back to home</value></data>
+  <data name="Nav.Builder" xml:space="preserve"><value>App Builder</value></data>
+  <data name="Builder.Eyebrow" xml:space="preserve"><value>AI App Builder</value></data>
+  <data name="Builder.Title" xml:space="preserve"><value>From App Idea to Prototype in 10 Seconds</value></data>
+  <data name="Builder.Subtitle" xml:space="preserve"><value>You describe your idea – we build and deliver your application from the ground up with modern .NET and AI. Start with a project blueprint: features, data model, screen sketches and a timeline, ready to discuss with Adel.</value></data>
+  <data name="Builder.IdeaLabel" xml:space="preserve"><value>Your app idea</value></data>
+  <data name="Builder.IdeaPlaceholder" xml:space="preserve"><value>E.g. an app where hairdressers can take bookings, send reminders and charge in advance...</value></data>
+  <data name="Builder.QuickLabel" xml:space="preserve"><value>Quick picks</value></data>
+  <data name="Builder.Counter" xml:space="preserve"><value>{0} / {1} characters</value></data>
+  <data name="Builder.MinHint" xml:space="preserve"><value>Describe the idea with at least {0} characters.</value></data>
+  <data name="Builder.Generate" xml:space="preserve"><value>Generate blueprint</value></data>
+  <data name="Builder.Generating" xml:space="preserve"><value>Generating...</value></data>
+  <data name="Builder.Loading" xml:space="preserve"><value>The AI is designing your blueprint...</value></data>
+  <data name="Builder.Reset" xml:space="preserve"><value>New idea</value></data>
+  <data name="Builder.Disclaimer" xml:space="preserve"><value>AI-generated draft. The timeline is an indicative estimate, not a fixed quote – Adel will go through it with you.</value></data>
+  <data name="Builder.Error.NotAnIdea" xml:space="preserve"><value>That doesn&apos;t look like an app idea. Describe what the app should do and who it is for, and we&apos;ll try again.</value></data>
+  <data name="Builder.Preset.Booking" xml:space="preserve"><value>Booking system</value></data>
+  <data name="Builder.Preset.Booking.Idea" xml:space="preserve"><value>A booking system where customers can see available times, book online and get reminders, and where the business can manage its schedule and customers.</value></data>
+  <data name="Builder.Preset.Saas" xml:space="preserve"><value>SaaS platform</value></data>
+  <data name="Builder.Preset.Saas.Idea" xml:space="preserve"><value>A multi-tenant SaaS platform with subscription plans, user roles and a dashboard with statistics for each customer.</value></data>
+  <data name="Builder.Preset.Shop" xml:space="preserve"><value>E-commerce</value></data>
+  <data name="Builder.Preset.Shop.Idea" xml:space="preserve"><value>An online store with a product catalogue, shopping cart, card checkout and an admin panel to manage products, stock and orders.</value></data>
+  <data name="Builder.Tabs.Label" xml:space="preserve"><value>Blueprint</value></data>
+  <data name="Builder.Tab.Overview" xml:space="preserve"><value>Overview &amp; Quote</value></data>
+  <data name="Builder.Tab.Data" xml:space="preserve"><value>Database &amp; Architecture</value></data>
+  <data name="Builder.Tab.Prototype" xml:space="preserve"><value>Live Preview</value></data>
+  <data name="Builder.Tab.Source" xml:space="preserve"><value>Source</value></data>
+  <data name="Builder.Tab.Book" xml:space="preserve"><value>Contact Adel</value></data>
+  <data name="Builder.Overview.Summary" xml:space="preserve"><value>Project overview</value></data>
+  <data name="Builder.Overview.Stories" xml:space="preserve"><value>Key features</value></data>
+  <data name="Builder.Overview.TechTitle" xml:space="preserve"><value>Services and capabilities</value></data>
+  <data name="Builder.Overview.Timeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="Builder.Overview.Total" xml:space="preserve"><value>about {0} weeks in total</value></data>
+  <data name="Builder.Overview.Week" xml:space="preserve"><value>Week {0}</value></data>
+  <data name="Builder.Overview.WeekRange" xml:space="preserve"><value>Weeks {0}–{1}</value></data>
+  <data name="Builder.Overview.Indicative" xml:space="preserve"><value>Indicative estimate – not a fixed quote. Price and exact scope are agreed with Adel after a short meeting.</value></data>
+  <data name="Builder.Overview.Cta" xml:space="preserve"><value>Contact Adel</value></data>
+  <data name="Builder.Arch.Title" xml:space="preserve"><value>Architecture</value></data>
+  <data name="Builder.Arch.Client" xml:space="preserve"><value>Browser client</value></data>
+  <data name="Builder.Arch.Db" xml:space="preserve"><value>{0} tables</value></data>
+  <data name="Builder.Arch.Hosting" xml:space="preserve"><value>Delivered as Docker containers on Azure</value></data>
+  <data name="Builder.Arch.Extras" xml:space="preserve"><value>Complementary technologies</value></data>
+  <data name="Builder.Data.Title" xml:space="preserve"><value>Data model</value></data>
+  <data name="Builder.Data.FieldCount" xml:space="preserve"><value>{0} fields</value></data>
+  <data name="Builder.Data.Fields" xml:space="preserve"><value>Fields</value></data>
+  <data name="Builder.Data.Field" xml:space="preserve"><value>Field</value></data>
+  <data name="Builder.Data.Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Builder.Data.Note" xml:space="preserve"><value>Note</value></data>
+  <data name="Builder.Data.Relations" xml:space="preserve"><value>Relations</value></data>
+  <data name="Builder.Data.NoRelations" xml:space="preserve"><value>No relations.</value></data>
+  <data name="Builder.Data.ShowSql" xml:space="preserve"><value>Show SQL</value></data>
+  <data name="Builder.Data.HideSql" xml:space="preserve"><value>Show fields</value></data>
+  <data name="Builder.Data.SqlNote" xml:space="preserve"><value>Illustrative PostgreSQL schema – the details are refined together during the project.</value></data>
+  <data name="Builder.Proto.Hint" xml:space="preserve"><value>Click between the main views of the app. The sketch shows which components each view contains.</value></data>
+  <data name="Builder.Preview.Fullscreen" xml:space="preserve"><value>Open fullscreen</value></data>
+  <data name="Builder.Preview.FrameTitle" xml:space="preserve"><value>Live preview of {0}</value></data>
+  <data name="Builder.Preview.ReviseTitle" xml:space="preserve"><value>Change your prototype in real time</value></data>
+  <data name="Builder.Preview.ReviseLabel" xml:space="preserve"><value>Change</value></data>
+  <data name="Builder.Preview.RevisePlaceholder" xml:space="preserve"><value>Describe what should change...</value></data>
+  <data name="Builder.Preview.ReviseNote" xml:space="preserve"><value>The change is redrawn in the preview. The overview and timeline stay as they are.</value></data>
+  <data name="Builder.Preview.ReviseSend" xml:space="preserve"><value>Update prototype</value></data>
+  <data name="Builder.Preview.Revising" xml:space="preserve"><value>Updating the prototype...</value></data>
+  <data name="Builder.Preview.Updated" xml:space="preserve"><value>The prototype has been updated.</value></data>
+  <data name="Builder.Preview.Chip.Dark" xml:space="preserve"><value>Switch to a dark theme</value></data>
+  <data name="Builder.Preview.Chip.Hours" xml:space="preserve"><value>Add opening hours &amp; a map</value></data>
+  <data name="Builder.Preview.Chip.Luxury" xml:space="preserve"><value>Make the design more luxurious</value></data>
+  <data name="Builder.Preview.Download" xml:space="preserve"><value>Download source (HTML/Tailwind)</value></data>
+  <data name="Builder.Preview.Deploy" xml:space="preserve"><value>Deploy this app with Adel Kobansson</value></data>
+  <data name="Builder.Preview.EmptySource" xml:space="preserve"><value>The source appears once a live preview has been generated.</value></data>
+  <data name="Builder.Source.Copy" xml:space="preserve"><value>Copy source</value></data>
+  <data name="Builder.Source.Copied" xml:space="preserve"><value>Copied!</value></data>
+  <data name="Builder.Source.CopyFailed" xml:space="preserve"><value>Couldn&apos;t copy</value></data>
+  <data name="Builder.Source.File" xml:space="preserve"><value>index.html</value></data>
+  <data name="Builder.Deploy.Intro" xml:space="preserve"><value>I want to deploy the prototype {0} – {1} with Adel Kobansson.</value></data>
+  <data name="Builder.Deploy.Code" xml:space="preserve"><value>Generated source (HTML/Tailwind):</value></data>
+  <data name="Builder.Proto.Nav" xml:space="preserve"><value>App views</value></data>
+  <data name="Builder.Book.Title" xml:space="preserve"><value>Ready to build this?</value></data>
+  <data name="Builder.Book.Text" xml:space="preserve"><value>We&apos;ve gathered your idea, features, tech, data model and timeline into a ready-made brief. Send it to Adel and he will get back to you quickly with the next steps.</value></data>
+  <data name="Builder.Book.Preview" xml:space="preserve"><value>Brief that will be sent</value></data>
+  <data name="Builder.Book.Note" xml:space="preserve"><value>You review and complete the message in the contact form before it is sent.</value></data>
+  <data name="Builder.Book.Send" xml:space="preserve"><value>Send the brief to Adel</value></data>
+  <data name="Builder.Book.Copy" xml:space="preserve"><value>Copy brief</value></data>
+  <data name="Builder.Book.Copied" xml:space="preserve"><value>Copied!</value></data>
+  <data name="Builder.Book.CopyFailed" xml:space="preserve"><value>Couldn&apos;t copy</value></data>
+  <data name="Builder.Book.OrMail" xml:space="preserve"><value>Or email directly</value></data>
+  <data name="Builder.Book.MailTo" xml:space="preserve"><value>Email {0}</value></data>
+  <data name="Builder.Brief.Greeting" xml:space="preserve"><value>Hi Adel!</value></data>
+  <data name="Builder.Brief.Intro" xml:space="preserve"><value>I&apos;d like to discuss a project: {0} – {1}</value></data>
+  <data name="Builder.Brief.Idea" xml:space="preserve"><value>My idea:</value></data>
+  <data name="Builder.Brief.Summary" xml:space="preserve"><value>Summary:</value></data>
+  <data name="Builder.Brief.Features" xml:space="preserve"><value>Key features:</value></data>
+  <data name="Builder.Brief.Tech" xml:space="preserve"><value>Tech:</value></data>
+  <data name="Builder.Brief.Data" xml:space="preserve"><value>Data model:</value></data>
+  <data name="Builder.Brief.Screens" xml:space="preserve"><value>Main views:</value></data>
+  <data name="Builder.Brief.Timeline" xml:space="preserve"><value>Timeline (indicative): {0} delivery phases, about {1} weeks</value></data>
+  <data name="Builder.Brief.Footer" xml:space="preserve"><value>Brief created with the AI App Builder on your website.</value></data>
+  <data name="Builder.Brief.MailSubject" xml:space="preserve"><value>Project enquiry: {0}</value></data>
+  <data name="Contact.PrefillNote" xml:space="preserve"><value>The brief from the AI App Builder has been filled in. Review it, add your name and email, and send.</value></data>
+  <data name="Hero.CtaBuilder" xml:space="preserve"><value>Create your app idea now</value></data>
+</root>

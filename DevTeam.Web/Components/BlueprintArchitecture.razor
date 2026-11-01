@@ -1,0 +1,268 @@
+@using System.Text
+@using DevTeam.Web.Models
+@inject IStringLocalizer<Strings> L
+
+@* Flik 2: Databas & Arkitektur – arkitekturskiss, klickbara tabeller med fält och relationer samt ett SQL-förslag. *@
+<div class="space-y-6">
+
+    @* Arkitekturskiss: klient → API → databas, driftsatt som containrar på Azure *@
+    <section class="glass-card accent-blue p-5 sm:p-6" aria-labelledby="bp-arch">
+        <h4 id="bp-arch" class="group-label">@L["Builder.Arch.Title"]</h4>
+
+        <div class="mt-3 flex flex-col items-stretch gap-3 md:flex-row md:items-center">
+            <div class="flex-1 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-4 text-center">
+                <p class="text-sm font-semibold text-cyan-100">Blazor WebAssembly</p>
+                <p class="mt-1 text-xs text-cyan-200/70">@L["Builder.Arch.Client"]</p>
+            </div>
+            <span class="self-center text-zinc-500" aria-hidden="true">
+                <svg class="h-5 w-5 rotate-90 md:rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </span>
+            <div class="flex-1 rounded-xl border border-purple-400/30 bg-purple-400/10 p-4 text-center">
+                <p class="text-sm font-semibold text-purple-100">ASP.NET Core Web API</p>
+                <p class="mt-1 text-xs text-purple-200/70">Modern .NET</p>
+            </div>
+            <span class="self-center text-zinc-500" aria-hidden="true">
+                <svg class="h-5 w-5 rotate-90 md:rotate-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </span>
+            <div class="flex-1 rounded-xl border border-blue-400/30 bg-blue-400/10 p-4 text-center">
+                <p class="text-sm font-semibold text-blue-100">PostgreSQL</p>
+                <p class="mt-1 text-xs text-blue-200/70">@L["Builder.Arch.Db", Spec.Entities.Count]</p>
+            </div>
+        </div>
+
+        <p class="mt-4 flex items-center justify-center gap-2 rounded-lg border border-dashed border-white/15 px-3 py-2 text-center text-xs text-zinc-400">
+            <span aria-hidden="true">🐳</span>@L["Builder.Arch.Hosting"]
+        </p>
+
+        @if (Extras.Count > 0)
+        {
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+                <span class="text-xs text-zinc-500">@L["Builder.Arch.Extras"]:</span>
+                @foreach (var extra in Extras)
+                {
+                    <span class="chip accent-green">@extra</span>
+                }
+            </div>
+        }
+    </section>
+
+    @* Datamodell *@
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <section class="lg:col-span-2" aria-labelledby="bp-entities">
+            <h4 id="bp-entities" class="group-label">@L["Builder.Data.Title"]</h4>
+            <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                @foreach (var entity in Spec.Entities)
+                {
+                    var isSelected = Selected == entity;
+                    <li>
+                        <button type="button" @onclick="() => Select(entity)" aria-pressed="@(isSelected ? "true" : "false")"
+                                class="group w-full rounded-xl border p-4 text-left backdrop-blur-md transition-all duration-300 @(isSelected ? "border-cyan-400/60 bg-cyan-400/10 shadow-[0_0_28px_-8px] shadow-cyan-400/60" : "border-white/10 bg-white/[0.04] hover:border-white/30 hover:bg-white/[0.07]")">
+                            <span class="flex items-center justify-between gap-3">
+                                <span class="flex items-center gap-2.5">
+                                    <span class="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-white/5 text-zinc-300" aria-hidden="true">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" /></svg>
+                                    </span>
+                                    <span class="font-semibold text-white">@entity.Name</span>
+                                </span>
+                                <span class="text-xs text-zinc-500">@L["Builder.Data.FieldCount", entity.Fields.Count]</span>
+                            </span>
+                            <span class="mt-2 block text-sm leading-snug text-zinc-400">@entity.Description</span>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </section>
+
+        @if (Selected is not null)
+        {
+            <section class="lg:col-span-3" aria-live="polite" aria-label="@Selected.Name">
+                <div class="glass-card accent-cyan overflow-hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4">
+                        <div class="min-w-0">
+                            <h5 class="truncate font-mono text-lg font-bold text-white">@TableName(Selected.Name)</h5>
+                            <p class="text-xs text-zinc-500">@Selected.Name</p>
+                        </div>
+                        <button type="button" @onclick="() => _showSql = !_showSql" aria-pressed="@(_showSql ? "true" : "false")"
+                                class="btn btn-glass !px-3.5 !py-2 !text-xs">
+                            <span aria-hidden="true" class="font-mono">&lt;/&gt;</span> @(_showSql ? L["Builder.Data.HideSql"] : L["Builder.Data.ShowSql"])
+                        </button>
+                    </div>
+
+                    @if (_showSql)
+                    {
+                        <div class="p-5">
+                            <pre class="overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 font-mono text-xs leading-relaxed text-cyan-100/90">@BuildSql(Selected)</pre>
+                            <p class="mt-2 text-xs text-zinc-500">@L["Builder.Data.SqlNote"]</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[20rem] text-left text-sm">
+                                <caption class="sr-only">@L["Builder.Data.Fields"] – @Selected.Name</caption>
+                                <thead>
+                                    <tr class="text-xs uppercase tracking-wider text-zinc-500">
+                                        <th scope="col" class="px-5 py-3 font-semibold">@L["Builder.Data.Field"]</th>
+                                        <th scope="col" class="px-3 py-3 font-semibold">@L["Builder.Data.Type"]</th>
+                                        <th scope="col" class="px-5 py-3 font-semibold">@L["Builder.Data.Note"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    @foreach (var field in Selected.Fields)
+                                    {
+                                        <tr class="transition-colors hover:bg-white/[0.04]">
+                                            <td class="px-5 py-2.5 font-mono text-zinc-100">@field.Name</td>
+                                            <td class="px-3 py-2.5 font-mono text-xs text-purple-200/90">@field.Type</td>
+                                            <td class="px-5 py-2.5">
+                                                @if (!string.IsNullOrWhiteSpace(field.Note))
+                                                {
+                                                    <span class="inline-block rounded-md border px-2 py-0.5 text-[11px] font-semibold @NoteClasses(field.Note)">@field.Note</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="border-t border-white/10 px-5 py-4">
+                        <h6 class="group-label">@L["Builder.Data.Relations"]</h6>
+                        @if (Selected.Relations.Count == 0)
+                        {
+                            <p class="text-sm text-zinc-500">@L["Builder.Data.NoRelations"]</p>
+                        }
+                        else
+                        {
+                            <ul class="flex flex-wrap gap-2">
+                                @foreach (var relation in Selected.Relations)
+                                {
+                                    var target = Spec.Entities.FirstOrDefault(e => e.Name.Equals(relation.Target, StringComparison.OrdinalIgnoreCase));
+                                    <li>
+                                        <button type="button" disabled="@(target is null)" @onclick="() => { if (target is not null) Select(target); }"
+                                                class="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-zinc-200 transition hover:border-cyan-400/50 hover:bg-cyan-400/10 hover:text-white">
+                                            <span aria-hidden="true" class="text-zinc-500">→</span>
+                                            <span class="font-medium">@relation.Target</span>
+                                            <span class="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[11px] text-cyan-200">@relation.Cardinality</span>
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public AppSpec Spec { get; set; } = default!;
+
+    private SpecEntity? _selected;
+    private bool _showSql;
+
+    // Vald tabell; faller tillbaka på den första om blueprinten byttes ut.
+    private SpecEntity? Selected => _selected is not null && Spec.Entities.Contains(_selected) ? _selected : Spec.Entities.FirstOrDefault();
+
+    /// <summary>Tekniker utöver basstacken (de första fem), t.ex. Stripe eller SignalR.</summary>
+    private List<string> Extras => Spec.TechStack.Skip(5).ToList();
+
+    private void Select(SpecEntity entity) => _selected = entity;
+
+    private static string NoteClasses(string note)
+    {
+        var n = note.Trim().ToLowerInvariant();
+        return n switch
+        {
+            "pk" => "border-amber-300/40 bg-amber-300/10 text-amber-200",
+            "fk" => "border-cyan-400/40 bg-cyan-400/10 text-cyan-200",
+            _ when n.Contains("uni") => "border-purple-400/40 bg-purple-400/10 text-purple-200",
+            _ => "border-white/10 bg-white/5 text-zinc-300"
+        };
+    }
+
+    // ---------------------------------------------------------------- SQL-förslag (PostgreSQL)
+
+    private string BuildSql(SpecEntity entity)
+    {
+        var sql = new StringBuilder();
+        sql.Append("CREATE TABLE ").Append(TableName(entity.Name)).AppendLine(" (");
+
+        for (var i = 0; i < entity.Fields.Count; i++)
+        {
+            var field = entity.Fields[i];
+            var note = field.Note.Trim().ToLowerInvariant();
+
+            sql.Append("  ").Append(Snake(field.Name)).Append(' ').Append(SqlType(field.Type));
+
+            if (note == "pk") sql.Append(" PRIMARY KEY");
+            else if (!(note.Contains("optional") || note.Contains("valfri") || note.Contains("null"))) sql.Append(" NOT NULL");
+
+            if (note.Contains("uni")) sql.Append(" UNIQUE");
+
+            if (note == "fk" && ReferencedTable(field.Name) is { } referenced)
+                sql.Append(" REFERENCES ").Append(referenced).Append("(id)");
+
+            sql.AppendLine(i < entity.Fields.Count - 1 ? "," : "");
+        }
+
+        return sql.Append(");").ToString();
+    }
+
+    /// <summary>"userId" → tabellen för entiteten "User", om en sådan finns i blueprinten.</summary>
+    private string? ReferencedTable(string fieldName)
+    {
+        if (!fieldName.EndsWith("Id", StringComparison.Ordinal) || fieldName.Length <= 2) return null;
+
+        var stem = fieldName[..^2];
+        var match = Spec.Entities.FirstOrDefault(e => e.Name.Equals(stem, StringComparison.OrdinalIgnoreCase));
+
+        // "slotId" → "AvailabilitySlot": en entitet som slutar på stammen, men bara om det är entydigt.
+        if (match is null)
+        {
+            var endsWith = Spec.Entities.Where(e => e.Name.EndsWith(stem, StringComparison.OrdinalIgnoreCase)).Take(2).ToList();
+            if (endsWith.Count == 1) match = endsWith[0];
+        }
+
+        return match is null ? null : TableName(match.Name);
+    }
+
+    private static string SqlType(string type) => type.Trim().ToLowerInvariant() switch
+    {
+        "uuid" or "guid" => "uuid",
+        "string" or "varchar" => "varchar(255)",
+        "text" => "text",
+        "int" or "integer" => "integer",
+        "long" or "bigint" => "bigint",
+        "decimal" or "money" or "number" => "numeric(12,2)",
+        "float" or "double" => "double precision",
+        "bool" or "boolean" => "boolean",
+        "datetime" or "timestamp" => "timestamptz",
+        "date" => "date",
+        "enum" => "varchar(30)",
+        "json" or "jsonb" => "jsonb",
+        _ => "text"
+    };
+
+    /// <summary>Entitetsnamn (PascalCase, singular) till tabellnamn (snake_case, plural).</summary>
+    private static string TableName(string entityName)
+    {
+        var s = Snake(entityName);
+        if (s.EndsWith('s') || s.EndsWith('x') || s.EndsWith("ch") || s.EndsWith("sh")) return s + "es";
+        if (s.EndsWith('y') && s.Length > 1 && !"aeiou".Contains(s[^2])) return s[..^1] + "ies";
+        return s + "s";
+    }
+
+    private static string Snake(string name)
+    {
+        var sb = new StringBuilder(name.Length + 4);
+        for (var i = 0; i < name.Length; i++)
+        {
+            var c = name[i];
+            if (char.IsUpper(c) && i > 0 && (char.IsLower(name[i - 1]) || char.IsDigit(name[i - 1]))) sb.Append('_');
+            sb.Append(char.IsLetterOrDigit(c) ? char.ToLowerInvariant(c) : '_');
+        }
+        return sb.ToString();
+    }
+}

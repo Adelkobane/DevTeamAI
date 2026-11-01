@@ -1,0 +1,101 @@
+@using DevTeam.Web.Models
+@implements IDisposable
+@inject HttpClient Http
+@inject IStringLocalizer<Strings> L
+
+@* Systemstatus i hero-sektionen. Värdena är riktiga: de kommer från GET /api/status
+   (API svarar / körs i Azure / AI-leverantör konfigurerad) och uppdateras var 60:e sekund. *@
+<div class="inline-flex max-w-full flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3.5 shadow-[0_0_40px_-18px] shadow-cyan-400/50 backdrop-blur-md sm:flex-row sm:gap-5 sm:rounded-full sm:px-6 sm:py-3"
+     role="group" aria-label="@L["Status.Title"]">
+    <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">@L["Status.Title"]</span>
+    <span class="hidden h-4 w-px bg-white/10 sm:block" aria-hidden="true"></span>
+    <ul class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-zinc-200" aria-live="polite">
+        @StatusItem(ApiDot, ApiText)
+        @StatusItem(AzureDot, AzureText)
+        @StatusItem(AiDot, AiText)
+    </ul>
+</div>
+
+@code {
+    private enum Dot { Checking, Ok, Standby, Off, Error }
+
+    private SystemStatus? _status;
+    private bool _failed;
+    private readonly CancellationTokenSource _cts = new();
+
+    private Dot ApiDot => _failed ? Dot.Error : _status is null ? Dot.Checking : Dot.Ok;
+    private Dot AzureDot => _failed ? Dot.Off : _status is null ? Dot.Checking : _status.Azure ? Dot.Ok : Dot.Off;
+    private Dot AiDot => _failed ? Dot.Off : _status is null ? Dot.Checking : _status.Ai ? Dot.Ok : Dot.Standby;
+
+    private string ApiText => _failed ? L["Status.Api.Offline"].Value : _status is null ? L["Status.Checking"].Value : L["Status.Api.Online"].Value;
+    private string AzureText => _failed ? L["Status.Unknown", "Azure"].Value : _status is null ? L["Status.Checking"].Value : _status.Azure ? L["Status.Azure.Live"].Value : L["Status.Azure.Local"].Value;
+    private string AiText => _failed ? L["Status.Unknown", "AI"].Value : _status is null ? L["Status.Checking"].Value : _status.Ai ? L["Status.Ai.Active"].Value : L["Status.Ai.Standby"].Value;
+
+    private RenderFragment StatusItem(Dot dot, string text) =>
+        @<li class="flex items-center gap-2.5">
+            <span class="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+                @if (dot == Dot.Ok)
+                {
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 motion-safe:animate-ping"></span>
+                }
+                <span class="relative inline-flex h-2.5 w-2.5 rounded-full @DotClasses(dot)"></span>
+            </span>
+            <span>@text</span>
+        </li>;
+
+    private static string DotClasses(Dot dot) => dot switch
+    {
+        Dot.Ok => "bg-emerald-400 shadow-[0_0_10px] shadow-emerald-400",
+        Dot.Standby => "bg-amber-400 shadow-[0_0_8px] shadow-amber-400/70",
+        Dot.Error => "bg-red-400 shadow-[0_0_10px] shadow-red-400",
+        Dot.Checking => "bg-zinc-500 motion-safe:animate-pulse",
+        _ => "bg-zinc-500"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+        _ = PollAsync(_cts.Token);
+    }
+
+    private async Task PollAsync(CancellationToken ct)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                await InvokeAsync(RefreshAsync);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Komponenten togs bort.
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        try
+        {
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(6));
+
+            _status = await Http.GetFromJsonAsync<SystemStatus>("api/status", timeout.Token);
+            _failed = _status is null;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or OperationCanceledException)
+        {
+            if (_cts.IsCancellationRequested) return;
+            _failed = true;
+        }
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

@@ -1,0 +1,97 @@
+/* Blazor-specifika stilar. Allt övrigt hanteras av Tailwind (tailwind.css). */
+
+h1:focus {
+    outline: none;
+}
+
+/* Blazors valideringsklasser på formulärfält. */
+input.invalid, textarea.invalid {
+    border-color: rgb(248 113 113 / 0.8);
+}
+
+#blazor-error-ui {
+    color-scheme: light only;
+    background: #fef9c3;
+    color: #422006;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+.blazor-error-boundary {
+    background: #b32121;
+    padding: 1rem;
+    color: white;
+}
+
+.blazor-error-boundary::after {
+    content: "Ett fel har uppstått.";
+}
+
+html[lang="en"] .blazor-error-boundary::after {
+    content: "An error has occurred.";
+}
+
+/* Felmeddelandet i index.html finns på båda språken – visa bara det aktuella. */
+#blazor-error-ui [data-lang] {
+    display: none;
+}
+
+html[lang="sv"] #blazor-error-ui [data-lang="sv"],
+html[lang="en"] #blazor-error-ui [data-lang="en"] {
+    display: inline;
+}
+
+/* Laddningsindikator (mörkt tema) */
+.loading-progress {
+    position: absolute;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    inset: 20vh 0 auto 0;
+    margin: 0 auto 0 auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #27272a;
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #22d3ee;
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+    filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.7));
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    color: #a1a1aa;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Laddar");
+}
+
+html[lang="en"] .loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}

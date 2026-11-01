@@ -1,0 +1,197 @@
+@using System.Text
+@using DevTeam.Web.Models
+@using DevTeam.Web.Services
+@implements IDisposable
+@inject ContactPrefill Prefill
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> L
+
+@* Flik 4: Kontakta Adel – ett färdigt underlag av blueprinten som kan skickas via kontaktformuläret, mejlas eller kopieras. *@
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-5 lg:gap-8">
+
+    @* Underlaget *@
+    <section class="lg:col-span-3" aria-labelledby="bp-brief">
+        <h4 id="bp-brief" class="group-label">@L["Builder.Book.Preview"]</h4>
+        <div class="glass-card accent-cyan mt-3 p-1">
+            <pre tabindex="0" aria-label="@L["Builder.Book.Preview"]"
+                 class="max-h-[26rem] overflow-auto whitespace-pre-wrap break-words rounded-xl bg-black/30 p-4 font-sans text-sm leading-relaxed text-zinc-300">@_brief</pre>
+        </div>
+        <p class="mt-2 text-xs text-zinc-500">@L["Builder.Book.Note"]</p>
+    </section>
+
+    @* Åtgärder *@
+    <section class="lg:col-span-2" aria-labelledby="bp-book">
+        <div class="glass-card accent-purple h-full p-5 sm:p-6">
+            <h4 id="bp-book" class="text-xl font-bold text-white">@L["Builder.Book.Title"]</h4>
+            <p class="mt-2 text-sm leading-relaxed text-zinc-400">@L["Builder.Book.Text"]</p>
+
+            <button type="button" @onclick="SendToFormAsync" class="btn btn-gradient mt-6 w-full">
+                <span aria-hidden="true">🚀</span> @L["Builder.Book.Send"]
+            </button>
+
+            <button type="button" @onclick="CopyAsync"
+                    class="btn mt-3 w-full border @CopyClasses">
+                @(_copy switch { CopyState.Copied => L["Builder.Book.Copied"], CopyState.Failed => L["Builder.Book.CopyFailed"], _ => L["Builder.Book.Copy"] })
+            </button>
+            <span class="sr-only" role="status">@(_copy == CopyState.Copied ? L["Builder.Book.Copied"].Value : "")</span>
+
+            @if (Mailable.Count > 0)
+            {
+                <div class="mt-6 border-t border-white/10 pt-5">
+                    <p class="group-label">@L["Builder.Book.OrMail"]</p>
+                    <div class="mt-2 flex flex-col gap-2.5 sm:flex-row lg:flex-col xl:flex-row">
+                        @foreach (var profile in Mailable)
+                        {
+                            <a href="@MailHref(profile)"
+                               class="btn btn-glass flex-1 !px-4 !py-2.5 hover:!border-cyan-400/50">
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                                @L["Builder.Book.MailTo", FirstName(profile)]
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private enum CopyState { Idle, Copied, Failed }
+
+    private const int MaxMessageLength = 2000; // kort underlag i den här fliken; formuläret rymmer 60 000 tecken när källkoden skickas från live-prototypen
+    private const int MaxMailtoBodyLength = 900; // långa mailto-länkar kapas av många e-postklienter
+
+    [Parameter, EditorRequired] public AppSpec Spec { get; set; } = default!;
+
+    /// <summary>Idén som blueprinten genererades från (kundens egna ord).</summary>
+    [Parameter] public string Idea { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<DeveloperProfile>? Profiles { get; set; }
+
+    private string _brief = string.Empty;
+    private CopyState _copy = CopyState.Idle;
+    private CancellationTokenSource? _copyResetCts;
+
+    private List<DeveloperProfile> Mailable =>
+        (Profiles ?? []).Where(p => !string.IsNullOrWhiteSpace(p.Email)).ToList();
+
+    private string CopyClasses => _copy switch
+    {
+        CopyState.Copied => "border-emerald-400/60 bg-emerald-400/15 text-emerald-200 shadow-[0_0_24px_-4px] shadow-emerald-400/60",
+        CopyState.Failed => "border-red-400/50 bg-red-400/10 text-red-200",
+        _ => "border-white/15 bg-white/5 text-zinc-100 hover:border-white/30 hover:bg-white/10"
+    };
+
+    protected override void OnParametersSet() => _brief = ComposeBrief();
+
+    private static string FirstName(DeveloperProfile profile) =>
+        profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? profile.Name;
+
+    private string MailHref(DeveloperProfile profile)
+    {
+        var subject = L["Builder.Brief.MailSubject", Spec.Title].Value;
+        var body = Cap(_brief, MaxMailtoBodyLength);
+        return $"mailto:{profile.Email.Trim()}?subject={Uri.EscapeDataString(subject)}&body={Uri.EscapeDataString(body)}";
+    }
+
+    /// <summary>Fyller i kontaktformuläret med underlaget, scrollar dit och flyttar fokus till namnfältet.</summary>
+    private async Task SendToFormAsync()
+    {
+        Prefill.Request(_brief);
+
+        try
+        {
+            await JS.InvokeVoidAsync("devteam.scrollToId", "contact-form");
+            await Task.Delay(700); // låt den mjuka scrollningen hinna fram innan fokus flyttas
+            await JS.InvokeVoidAsync("devteam.focusId", "contact-name");
+        }
+        catch (Exception ex) when (ex is JSException or TaskCanceledException or InvalidOperationException)
+        {
+            // Underlaget är redan ifyllt i formuläret; scroll och fokus är bara bekvämlighet.
+        }
+    }
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            // Se wwwroot/js/clipboard.js (Clipboard API med reservmetod).
+            _copy = await JS.InvokeAsync<bool>("devteam.copyText", _brief) ? CopyState.Copied : CopyState.Failed;
+        }
+        catch (JSException)
+        {
+            _copy = CopyState.Failed;
+        }
+
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+        _copyResetCts = new CancellationTokenSource();
+        var token = _copyResetCts.Token;
+
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(2200, token);
+            _copy = CopyState.Idle;
+        }
+        catch (TaskCanceledException)
+        {
+            // En nyare kopiering tog över.
+        }
+    }
+
+    // ------------------------------------------------------------------ Underlaget
+
+    private string ComposeBrief()
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine(L["Builder.Brief.Greeting"]);
+        sb.AppendLine();
+        sb.AppendLine(L["Builder.Brief.Intro", Spec.Title, Spec.Tagline]);
+
+        if (!string.IsNullOrWhiteSpace(Idea))
+        {
+            sb.AppendLine().AppendLine($"{L["Builder.Brief.Idea"]} {Cap(Idea.Trim(), 350)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(Spec.Summary))
+        {
+            sb.AppendLine().AppendLine($"{L["Builder.Brief.Summary"]} {Cap(Spec.Summary, 400)}");
+        }
+
+        if (Spec.UserStories.Count > 0)
+        {
+            sb.AppendLine().AppendLine(L["Builder.Brief.Features"]);
+            foreach (var story in Spec.UserStories.Take(5)) sb.AppendLine($"- {Cap(story, 170)}");
+        }
+
+        sb.AppendLine();
+        if (Spec.TechStack.Count > 0) sb.AppendLine($"{L["Builder.Brief.Tech"]} {string.Join(", ", Spec.TechStack)}");
+        if (Spec.Entities.Count > 0) sb.AppendLine($"{L["Builder.Brief.Data"]} {string.Join(", ", Spec.Entities.Select(e => e.Name))}");
+        if (Spec.UiComponents.Count > 0) sb.AppendLine($"{L["Builder.Brief.Screens"]} {string.Join(", ", Spec.UiComponents.Select(s => s.Name))}");
+        if (Spec.EstimatedTimeline.Count > 0)
+            sb.AppendLine(L["Builder.Brief.Timeline", Spec.EstimatedTimeline.Count, Spec.TotalWeeks].Value);
+
+        sb.AppendLine().Append(L["Builder.Brief.Footer"]);
+
+        return Cap(sb.ToString().Trim(), MaxMessageLength);
+    }
+
+    private static string Cap(string text, int max)
+    {
+        if (text.Length <= max) return text;
+
+        // Klipp vid sista mellanrummet så att inget ord delas, och markera att texten kortats.
+        var cut = text[..(max - 1)];
+        var lastSpace = cut.LastIndexOfAny([' ', '\n']);
+        return (lastSpace > max / 2 ? cut[..lastSpace] : cut).TrimEnd() + "…";
+    }
+
+    public void Dispose()
+    {
+        _copyResetCts?.Cancel();
+        _copyResetCts?.Dispose();
+    }
+}

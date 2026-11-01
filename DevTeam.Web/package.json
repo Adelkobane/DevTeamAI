@@ -1,0 +1,12 @@
+{
+  "name": "devteam-web",
+  "private": true,
+  "scripts": {
+    "css:build": "tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind.css --minify",
+    "css:watch": "tailwindcss -i ./Styles/tailwind.css -o ./wwwroot/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.0",
+    "tailwindcss": "^4.1.0"
+  }
+}

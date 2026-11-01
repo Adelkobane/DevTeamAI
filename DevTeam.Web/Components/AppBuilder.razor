@@ -1,0 +1,323 @@
+@using DevTeam.Web.Models
+@using DevTeam.Web.Services
+@implements IDisposable
+@inject AiClient Ai
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> L
+
+@* AI Blueprint & App Generator: kundens idé in, en komplett projektspecifikation ut (5 flikar). *@
+<section id="appbyggare" class="anchor-section">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader Eyebrow="@L["Builder.Eyebrow"]"
+                       Title="@L["Builder.Title"]"
+                       Subtitle="@L["Builder.Subtitle"]" />
+
+        @* ───────────── Inmatning ───────────── *@
+        <div data-reveal class="glow-surface relative mx-auto mt-10 max-w-3xl rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md sm:mt-14 sm:p-8 hover:shadow-[0_0_50px_-14px_rgba(34,211,238,0.4),0_14px_60px_-18px_rgba(168,85,247,0.45)] transition-shadow duration-500">
+            <div class="pointer-events-none absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-cyan-400/70 to-transparent" aria-hidden="true"></div>
+
+            <EditForm Model="this" OnSubmit="GenerateAsync" FormName="app-builder">
+                <label for="builder-idea" class="block text-sm font-medium text-zinc-300">@L["Builder.IdeaLabel"]</label>
+                <textarea id="builder-idea" @bind="_idea" @bind:event="oninput" rows="4" maxlength="@MaxIdeaLength"
+                          disabled="@_loading" placeholder="@L["Builder.IdeaPlaceholder"]"
+                          class="field resize-y text-base sm:text-sm"></textarea>
+
+                <div class="mt-2 flex items-center justify-between gap-3 text-xs">
+                    <span class="@(IdeaTooShort && _idea.Length > 0 ? "text-amber-300" : "text-zinc-500")">
+                        @(IdeaTooShort && _idea.Length > 0 ? L["Builder.MinHint", MinIdeaLength].Value : "")
+                    </span>
+                    <span class="text-zinc-500">@L["Builder.Counter", _idea.Trim().Length, MaxIdeaLength]</span>
+                </div>
+
+                @* Snabbval *@
+                <div class="mt-5">
+                    <p class="group-label">@L["Builder.QuickLabel"]</p>
+                    <div class="flex flex-wrap gap-2.5">
+                        @foreach (var preset in Presets)
+                        {
+                            <button type="button" @onclick="() => UsePreset(preset)" disabled="@_loading"
+                                    aria-pressed="@(IsActivePreset(preset) ? "true" : "false")"
+                                    class="chip @preset.Accent disabled:cursor-not-allowed disabled:opacity-50">
+                                <span aria-hidden="true" class="mr-1.5">@preset.Icon</span>@L[preset.LabelKey]
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                @if (_error is not null)
+                {
+                    <div class="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200" role="alert">@_error</div>
+                }
+
+                <button type="submit" disabled="@(_loading || IdeaTooShort)" class="btn btn-gradient mt-6 w-full sm:w-auto sm:px-8">
+                    @if (_loading)
+                    {
+                        <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+                            <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" class="opacity-75" />
+                        </svg>
+                        <span>@L["Builder.Generating"]</span>
+                    }
+                    else
+                    {
+                        <SparkleIcon CssClass="h-4 w-4" />
+                        <span>@L["Builder.Generate"]</span>
+                    }
+                </button>
+            </EditForm>
+        </div>
+
+        @* ───────────── Laddar ───────────── *@
+        @if (_loading)
+        {
+            <div class="mt-10 sm:mt-14" role="status" aria-live="polite">
+                <p class="mb-5 text-center text-sm font-medium text-cyan-200">@L["Builder.Loading"]</p>
+                <div class="grid animate-pulse gap-4 md:grid-cols-3" aria-hidden="true">
+                    @for (var i = 0; i < 3; i++)
+                    {
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                            <div class="h-4 w-1/2 rounded bg-white/10"></div>
+                            <div class="mt-5 space-y-3">
+                                <div class="h-3 w-full rounded bg-white/5"></div>
+                                <div class="h-3 w-5/6 rounded bg-white/5"></div>
+                                <div class="h-3 w-2/3 rounded bg-white/5"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @* ───────────── Resultat ───────────── *@
+        @if (_spec is not null && !_loading)
+        {
+            <div id="builder-result" class="motion-safe:animate-fade-up mt-10 scroll-mt-24 sm:mt-14">
+                <div class="mx-auto max-w-3xl text-center">
+                    <h3 class="text-gradient motion-safe:animate-gradient text-3xl font-extrabold tracking-tight sm:text-4xl">@_spec.Title</h3>
+                    <p class="mt-3 text-lg text-zinc-300">@_spec.Tagline</p>
+                    <ul class="mt-5 flex flex-wrap items-center justify-center gap-2" aria-label="@L["Builder.Overview.TechTitle"]">
+                        @for (var i = 0; i < _spec.TechStack.Count; i++)
+                        {
+                            <li class="chip @AccentFor(i)">@_spec.TechStack[i]</li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="glow-surface relative mt-8 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/50 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                    <div class="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-purple-500/15 blur-3xl" aria-hidden="true"></div>
+
+                    @* Flikar: 2 kolumner på mobil, en rad på stor skärm. Piltangenter flyttar mellan flikarna. *@
+                    <div role="tablist" aria-label="@L["Builder.Tabs.Label"]" @onkeydown="OnTabKeyDown"
+                         class="relative grid grid-cols-2 gap-1.5 border-b border-white/10 p-2 sm:grid-cols-3 xl:grid-cols-5">
+                        @foreach (var tab in Tabs)
+                        {
+                            var selected = _tab == tab.Tab;
+                            <button type="button" role="tab" id="builder-tab-@((int)tab.Tab)"
+                                    aria-selected="@(selected ? "true" : "false")" aria-controls="builder-panel-@((int)tab.Tab)"
+                                    tabindex="@(selected ? 0 : -1)"
+                                    @onclick="() => SelectTab(tab.Tab)"
+                                    class="flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-300 sm:text-sm @(selected ? ActiveTab : InactiveTab)">
+                                <span aria-hidden="true">@tab.Icon</span>
+                                <span>@L[tab.LabelKey]</span>
+                            </button>
+                        }
+                    </div>
+
+                    @* Alla paneler renderas men bara den valda visas, så att val i flikarna (t.ex. vald tabell) bevaras. *@
+                    <div class="relative p-4 sm:p-6 lg:p-8">
+                        <div role="tabpanel" id="builder-panel-0" aria-labelledby="builder-tab-0" hidden="@(_tab != BuilderTab.Overview)">
+                            <BlueprintOverview Spec="_spec" OnBook="() => SelectTab(BuilderTab.Book)" />
+                        </div>
+                        <div role="tabpanel" id="builder-panel-1" aria-labelledby="builder-tab-1" hidden="@(_tab != BuilderTab.Data)">
+                            <BlueprintArchitecture Spec="_spec" />
+                        </div>
+                        <div role="tabpanel" id="builder-panel-2" aria-labelledby="builder-tab-2" hidden="@(_tab != BuilderTab.Prototype)">
+                            <BlueprintLivePreview Spec="_spec" Idea="@_submittedIdea" OnPreviewUpdated="OnPreviewUpdated" />
+                        </div>
+                        <div role="tabpanel" id="builder-panel-3" aria-labelledby="builder-tab-3" hidden="@(_tab != BuilderTab.Source)">
+                            <BlueprintSource Spec="_spec" />
+                        </div>
+                        <div role="tabpanel" id="builder-panel-4" aria-labelledby="builder-tab-4" hidden="@(_tab != BuilderTab.Book)">
+                            <BlueprintBooking Spec="_spec" Idea="@_submittedIdea" Profiles="Profiles" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 flex flex-col items-center justify-between gap-3 text-center text-xs text-zinc-500 sm:flex-row sm:text-left">
+                    <p>@L["Builder.Disclaimer"]</p>
+                    <button type="button" @onclick="ResetAsync" class="btn btn-glass !px-4 !py-2 !text-xs">@L["Builder.Reset"]</button>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    private const int MinIdeaLength = 10;
+    private const int MaxIdeaLength = 1500;
+
+    private enum BuilderTab { Overview = 0, Data = 1, Prototype = 2, Source = 3, Book = 4 }
+
+    private sealed record Preset(string LabelKey, string IdeaKey, string Icon, string Accent);
+
+    private sealed record TabInfo(BuilderTab Tab, string LabelKey, string Icon);
+
+    private static readonly Preset[] Presets =
+    [
+        new("Builder.Preset.Booking", "Builder.Preset.Booking.Idea", "📅", "accent-cyan"),
+        new("Builder.Preset.Saas", "Builder.Preset.Saas.Idea", "☁️", "accent-purple"),
+        new("Builder.Preset.Shop", "Builder.Preset.Shop.Idea", "🛒", "accent-green")
+    ];
+
+    private static readonly TabInfo[] Tabs =
+    [
+        new(BuilderTab.Overview, "Builder.Tab.Overview", "📋"),
+        new(BuilderTab.Data, "Builder.Tab.Data", "🗄️"),
+        new(BuilderTab.Prototype, "Builder.Tab.Prototype", "🌐"),
+        new(BuilderTab.Source, "Builder.Tab.Source", "💻"),
+        new(BuilderTab.Book, "Builder.Tab.Book", "🚀")
+    ];
+
+    private const string ActiveTab = "bg-white/10 text-white shadow-[0_0_24px_-6px] shadow-cyan-400/60 ring-1 ring-cyan-400/40";
+    private const string InactiveTab = "text-zinc-400 hover:bg-white/5 hover:text-white";
+
+    /// <summary>Utvecklarprofilen (för "Kontakta Adel": direktmejl).</summary>
+    [Parameter] public IReadOnlyList<DeveloperProfile>? Profiles { get; set; }
+
+    private string _idea = string.Empty;
+    private string _submittedIdea = string.Empty; // idén som blueprinten gjordes av (användaren kan redigera fältet efteråt)
+    private AppSpec? _spec;
+    private bool _loading;
+    private string? _error;
+    private BuilderTab _tab = BuilderTab.Overview;
+    private CancellationTokenSource? _cts;
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private bool IdeaTooShort => _idea.Trim().Length < MinIdeaLength;
+
+    private bool IsActivePreset(Preset preset) => string.Equals(_idea.Trim(), L[preset.IdeaKey].Value, StringComparison.Ordinal);
+
+    private static string AccentFor(int index) => (index % 4) switch
+    {
+        0 => "accent-cyan",
+        1 => "accent-purple",
+        2 => "accent-blue",
+        _ => "accent-green"
+    };
+
+    private void UsePreset(Preset preset)
+    {
+        _idea = L[preset.IdeaKey].Value;
+        _error = null;
+    }
+
+    private async Task GenerateAsync()
+    {
+        if (_loading || IdeaTooShort) return;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        var token = _cts.Token;
+
+        _loading = true;
+        _error = null;
+        _spec = null;
+        _tab = BuilderTab.Overview;
+
+        try
+        {
+            var idea = _idea.Trim();
+            _spec = await Ai.GenerateSpecAsync(idea, Language, token);
+            _submittedIdea = idea;
+        }
+        catch (AiClientException ex)
+        {
+            _error = ErrorText(ex);
+        }
+        catch (OperationCanceledException)
+        {
+            // Komponenten togs bort eller en ny generering startades.
+            return;
+        }
+        finally
+        {
+            _loading = false;
+        }
+
+        if (_spec is not null)
+        {
+            StateHasChanged();
+            await ScrollTo("builder-result");
+        }
+    }
+
+    private async Task ResetAsync()
+    {
+        _spec = null;
+        _error = null;
+        _tab = BuilderTab.Overview;
+        StateHasChanged();
+        await ScrollTo("appbyggare");
+    }
+
+    private void OnPreviewUpdated(string html)
+    {
+        if (_spec is null || string.IsNullOrWhiteSpace(html)) return;
+        _spec.PreviewHtml = html;
+    }
+
+    private void SelectTab(BuilderTab tab) => _tab = tab;
+
+    private async Task OnTabKeyDown(KeyboardEventArgs e)
+    {
+        var count = Tabs.Length;
+        var index = (int)_tab;
+
+        var next = e.Key switch
+        {
+            "ArrowRight" => (index + 1) % count,
+            "ArrowLeft" => (index - 1 + count) % count,
+            "Home" => 0,
+            "End" => count - 1,
+            _ => -1
+        };
+
+        if (next < 0) return;
+
+        _tab = (BuilderTab)next;
+        StateHasChanged();
+        await JS.InvokeVoidAsync("devteam.focusId", $"builder-tab-{next}");
+    }
+
+    private async Task ScrollTo(string id)
+    {
+        try
+        {
+            await Task.Yield(); // låt Blazor rendera resultatet först
+            await JS.InvokeVoidAsync("devteam.scrollToId", id);
+        }
+        catch (JSException)
+        {
+            // Scrollen är en bonus – ignorera om den inte går.
+        }
+    }
+
+    private string ErrorText(AiClientException ex) => ex.Kind switch
+    {
+        AiErrorKind.RateLimited when ex.RetryAfterSeconds is { } seconds => L["Ai.ErrorRate", seconds].Value,
+        AiErrorKind.RateLimited => L["Ai.ErrorRateNoTime"].Value,
+        AiErrorKind.Unavailable => L["Ai.ErrorUnavailable"].Value,
+        AiErrorKind.BadRequest => L["Ai.ErrorBad"].Value,
+        AiErrorKind.NotAnIdea => L["Builder.Error.NotAnIdea"].Value,
+        AiErrorKind.Network => L["Ai.ErrorNetwork"].Value,
+        _ => L["Ai.ErrorGeneric"].Value
+    };
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

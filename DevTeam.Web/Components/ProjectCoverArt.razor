@@ -1,0 +1,88 @@
+@* Dekorativ fönster-mockup med unik glödande SVG per projekt. Ersätter bokstavsplatshållarna. *@
+<div class="absolute inset-0 @AccentClass" aria-hidden="true">
+    <div class="absolute inset-0 bg-linear-to-br @GradientClass"></div>
+    <div class="absolute inset-0 @PatternClass"></div>
+
+    <div class="absolute inset-x-5 bottom-0 top-7 flex flex-col overflow-hidden rounded-t-xl border border-b-0 border-white/15 bg-zinc-950/70 shadow-2xl backdrop-blur-sm transition-transform duration-500 group-hover:-translate-y-1 sm:inset-x-6 sm:top-8">
+        <div class="flex shrink-0 items-center gap-1.5 border-b border-white/10 px-3 py-2">
+            <span class="h-2 w-2 rounded-full bg-red-400/70"></span>
+            <span class="h-2 w-2 rounded-full bg-yellow-400/70"></span>
+            <span class="h-2 w-2 rounded-full bg-green-400/70"></span>
+            <span class="ml-2 h-2 flex-1 max-w-28 rounded-full bg-white/10"></span>
+        </div>
+
+        <div class="relative flex flex-1 items-center justify-center">
+            <div class="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-80 blur-2xl motion-safe:animate-float"
+                 style="background: radial-gradient(circle, rgb(var(--glow, 34 211 238) / 0.5), transparent 68%);"></div>
+
+            <svg class="project-cover-icon relative @IconSize transition-transform duration-500 group-hover:scale-105" viewBox="0 0 48 48" fill="none" focusable="false">
+                <defs>
+                    <linearGradient id="@Gid" x1="6" y1="4" x2="42" y2="44" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="@StopA" />
+                        <stop offset="55%" stop-color="@StopB" />
+                        <stop offset="100%" stop-color="@StopC" />
+                    </linearGradient>
+                    <filter id="@Fid" x="-45%" y="-45%" width="190%" height="190%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="1.15" result="glow" />
+                        <feMerge>
+                            <feMergeNode in="glow" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                <g filter="@GlowFilter" stroke="@Paint" stroke-linecap="round" stroke-linejoin="round">
+                    @switch (Kind)
+                    {
+                        case CoverKind.Builder:
+                            @* Blueprint-ark + AI-sparkle: automatisk app-generering. *@
+                            <path d="M11.5 10h15L34.5 18v19.5a3 3 0 0 1-3 3h-17a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3Z" stroke-width="1.7" fill="@Paint" fill-opacity="0.08" />
+                            <path d="M26.5 10v7.2a1.8 1.8 0 0 0 1.8 1.8h7.2" stroke-width="1.7" />
+                            <path d="M15 24.5h14M15 29.5h14M15 34.5h8.5" stroke-width="1.3" opacity="0.75" />
+                            <path d="M36 13 38.1 18.4 43.6 20.5 38.1 22.6 36 28 33.9 22.6 28.4 20.5 33.9 18.4Z" fill="@Paint" stroke-width="1.15" />
+                            <path d="M17.5 16v3.6M15.7 17.8h3.6" stroke-width="1.55" />
+                            break;
+
+                        default:
+                            @* Studiowebb: chattbubblor + gnista (DevTeamPortfolio). *@
+                            <path d="M9.5 14.5h18.5a3 3 0 0 1 3 3v8.5a3 3 0 0 1-3 3H16l-5 4v-4H9.5a3 3 0 0 1-3-3v-8.5a3 3 0 0 1 3-3Z" stroke-width="1.6" fill="@Paint" fill-opacity="0.08" />
+                            <path d="M20 31.5h15.5a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H32l-3.5 3v-3h-8.5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3Z" stroke-width="1.6" fill="@Paint" fill-opacity="0.12" />
+                            <path d="M38.5 12.5 39.7 15.8 43 17 39.7 18.2 38.5 21.5 37.3 18.2 34 17 37.3 15.8Z" fill="@Paint" stroke-width="1.05" />
+                            break;
+                    }
+                </g>
+            </svg>
+        </div>
+    </div>
+</div>
+
+@code {
+    private enum CoverKind { Builder, Studio }
+
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public bool Featured { get; set; }
+
+    private CoverKind Kind =>
+        Title.Contains("AppBuilder", StringComparison.OrdinalIgnoreCase) ? CoverKind.Builder
+        : CoverKind.Studio;
+
+    // Unika SVG-id:n per kort, så att gradienter inte krockar när flera kort syns samtidigt.
+    private string Token => string.Concat(Title.Where(char.IsLetterOrDigit)).ToLowerInvariant();
+    private string Gid => $"pcg-{Token}";
+    private string Fid => $"pcf-{Token}";
+    private string Paint => $"url(#{Gid})";
+    private string GlowFilter => $"url(#{Fid})";
+
+    private string IconSize => Featured ? "h-24 w-24 sm:h-28 sm:w-28" : "h-20 w-20";
+
+    private string AccentClass => Kind == CoverKind.Builder ? "accent-cyan" : "accent-blue";
+
+    private string GradientClass => Kind == CoverKind.Builder
+        ? "from-cyan-500/30 via-blue-600/20 to-purple-600/30"
+        : "from-blue-500/30 via-indigo-600/20 to-purple-600/30";
+
+    private string PatternClass => "pattern-grid";
+
+    private string StopA => Kind == CoverKind.Builder ? "#67e8f9" : "#93c5fd";
+    private string StopB => "#818cf8";
+    private string StopC => Kind == CoverKind.Builder ? "#e879f9" : "#c084fc";
+}

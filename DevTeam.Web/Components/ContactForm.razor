@@ -1,0 +1,253 @@
+@using DevTeam.Web.Models
+@using DevTeam.Web.Services
+@implements IDisposable
+@inject HttpClient Http
+@inject ContactPrefill Prefill
+@inject IConfiguration Configuration
+@inject IStringLocalizer<Strings> L
+
+<section id="kontakt" class="anchor-section">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader Eyebrow="@L["Contact.Eyebrow"]"
+                       Title="@L["Contact.Title"]"
+                       Subtitle="@L["Contact.Subtitle"]" />
+
+        <div class="mt-10 grid grid-cols-1 gap-6 sm:mt-14 sm:gap-8 lg:grid-cols-5">
+            @* Direktkontakt: ett kort per utvecklare (data kommer från API:t, med reserv från appsettings) *@
+            <aside data-reveal class="glass-card accent-purple flex flex-col p-5 sm:p-8 lg:col-span-2" aria-labelledby="direct-contact-title">
+                <h3 id="direct-contact-title" class="text-xl font-bold text-white">@L["Contact.DirectTitle"]</h3>
+                <p class="mt-2 text-zinc-400">@L["Contact.DirectText"]</p>
+
+                <div class="mt-6 space-y-4">
+                    @if (Loading)
+                    {
+                        <div class="animate-pulse rounded-xl border border-white/10 bg-zinc-950/50 p-4" aria-hidden="true">
+                            <div class="flex items-center gap-3">
+                                <div class="h-11 w-11 rounded-xl bg-white/10"></div>
+                                <div class="flex-1 space-y-2">
+                                    <div class="h-4 w-1/2 rounded bg-white/10"></div>
+                                    <div class="h-3 w-1/3 rounded bg-white/5"></div>
+                                </div>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div class="h-8 w-full rounded bg-white/5"></div>
+                                <div class="h-8 w-2/3 rounded bg-white/5"></div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @for (var i = 0; i < Contacts.Count; i++)
+                        {
+                            <DeveloperContactCard @key="Contacts[i].Id" Profile="Contacts[i]" Accent="@(i % 2 == 0 ? "cyan" : "purple")" />
+                        }
+                    }
+                </div>
+
+                <ul class="mt-8 space-y-3 text-sm text-zinc-400">
+                    <li class="flex items-center gap-3">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px] shadow-cyan-400"></span>
+                        @L["Contact.Point1"]
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 shadow-[0_0_8px] shadow-purple-400"></span>
+                        @L["Contact.Point2"]
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px] shadow-emerald-400"></span>
+                        @L["Contact.Point3"]
+                    </li>
+                </ul>
+            </aside>
+
+            @* Formulär *@
+            <div id="contact-form" data-reveal style="--reveal-delay:120ms" class="glass-card accent-cyan scroll-mt-24 p-5 sm:p-8 lg:col-span-3">
+                @if (_status == SubmitStatus.Success)
+                {
+                    <div class="flex h-full flex-col items-center justify-center py-10 text-center" role="status">
+                        <div class="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-400/10 text-emerald-300 shadow-[0_0_30px_-4px] shadow-emerald-400/60">
+                            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.75l6 6 9-13.5" /></svg>
+                        </div>
+                        <h3 class="mt-5 text-2xl font-bold text-white">@L["Form.SuccessTitle"]</h3>
+                        <p class="mt-2 text-zinc-400">@L["Form.SuccessText"]</p>
+                        <button type="button" @onclick="Reset" class="btn btn-glass mt-6 !py-2.5">@L["Form.SendAnother"]</button>
+                    </div>
+                }
+                else
+                {
+                    @if (_prefilled)
+                    {
+                        <div class="mb-5 flex items-start gap-3 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100" role="status">
+                            <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+                            <span>@L["Contact.PrefillNote"]</span>
+                        </div>
+                    }
+
+                    <EditForm Model="_model" OnValidSubmit="SubmitAsync" FormName="contact" novalidate>
+                        <DataAnnotationsValidator />
+
+                        <div class="space-y-5">
+                            <div class="grid gap-5 sm:grid-cols-2">
+                                <div>
+                                    <label for="contact-name" class="block text-sm font-medium text-zinc-300">@L["Form.Name"]</label>
+                                    <InputText id="contact-name" @bind-Value="_model.Name" autocomplete="name" class="field" placeholder="@L["Form.NamePlaceholder"]" />
+                                    <LocalizedValidationMessage For="() => _model.Name" CssClass="mt-1.5 block text-sm text-red-400" />
+                                </div>
+                                <div>
+                                    <label for="contact-email" class="block text-sm font-medium text-zinc-300">@L["Form.Email"]</label>
+                                    <InputText id="contact-email" type="email" @bind-Value="_model.Email" autocomplete="email" class="field" placeholder="@L["Form.EmailPlaceholder"]" />
+                                    <LocalizedValidationMessage For="() => _model.Email" CssClass="mt-1.5 block text-sm text-red-400" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="contact-message" class="block text-sm font-medium text-zinc-300">@L["Form.Message"]</label>
+                                <InputTextArea id="contact-message" @bind-Value="_model.Message" rows="@(_prefilled ? 14 : 6)" class="field resize-y" placeholder="@L["Form.MessagePlaceholder"]" />
+                                <LocalizedValidationMessage For="() => _model.Message" CssClass="mt-1.5 block text-sm text-red-400" />
+                            </div>
+
+                            @if (_status == SubmitStatus.Error)
+                            {
+                                <div class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200" role="alert">
+                                    @(_errorKey is null ? "" : L[_errorKey].Value)
+                                </div>
+                            }
+
+                            <button type="submit" disabled="@(_status == SubmitStatus.Sending)" class="btn btn-gradient w-full">
+                                @if (_status == SubmitStatus.Sending)
+                                {
+                                    <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+                                        <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" class="opacity-75" />
+                                    </svg>
+                                    <span>@L["Form.Sending"]</span>
+                                }
+                                else
+                                {
+                                    <span>@L["Form.Submit"]</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private enum SubmitStatus { Idle, Sending, Success, Error }
+
+    /// <summary>Utvecklarprofilerna från API:t (skickas in från startsidan).</summary>
+    [Parameter] public IReadOnlyList<DeveloperProfile>? Profiles { get; set; }
+
+    /// <summary>True medan profilerna laddas – visar platshållare i stället för kontaktkort.</summary>
+    [Parameter] public bool Loading { get; set; }
+
+    private ContactMessage _model = new();
+    private SubmitStatus _status = SubmitStatus.Idle;
+    private string? _errorKey; // resursnyckel, översätts vid rendering
+    private bool _prefilled;   // meddelandet kommer från AI Blueprint – visar en notis tills formuläret skickas/återställs
+
+    protected override void OnInitialized()
+    {
+        Prefill.Requested += OnPrefillRequested;
+
+        // Underlaget kan ha begärts innan formuläret hunnit lyssna (t.ex. vid omrendering av sidan).
+        if (Prefill.Pending is { } pending) ApplyPrefill(pending);
+    }
+
+    private void OnPrefillRequested(string message) => _ = InvokeAsync(() =>
+    {
+        ApplyPrefill(message);
+        StateHasChanged();
+    });
+
+    private void ApplyPrefill(string message)
+    {
+        _model.Message = message;
+        _status = SubmitStatus.Idle;
+        _errorKey = null;
+        _prefilled = true;
+        Prefill.Consume();
+    }
+
+    public void Dispose() => Prefill.Requested -= OnPrefillRequested;
+
+    /// <summary>
+    /// Kontakterna som visas. Profiler med minst en kontaktväg används. Om API:t inte svarar används
+    /// "ContactEmail", "LinkedInUrl" och "GitHubUrl" i wwwroot/appsettings.json som reserv (Adel Kobansson).
+    /// </summary>
+    private IReadOnlyList<DeveloperProfile> Contacts
+    {
+        get
+        {
+            var fromApi = (Profiles ?? [])
+                .Where(p => !string.IsNullOrWhiteSpace(p.Email) || !string.IsNullOrWhiteSpace(p.Phone)
+                         || !string.IsNullOrWhiteSpace(p.LinkedInUrl) || !string.IsNullOrWhiteSpace(p.GitHubUrl))
+                .ToList();
+            if (fromApi.Count > 0) return fromApi;
+
+            var email = Configuration["ContactEmail"];
+            var linkedIn = Configuration["LinkedInUrl"];
+            var gitHub = Configuration["GitHubUrl"];
+            if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(linkedIn) && string.IsNullOrWhiteSpace(gitHub))
+                return [];
+
+            return
+            [
+                new DeveloperProfile
+                {
+                    Id = "adel",
+                    Name = "Adel Kobansson",
+                    Email = email ?? string.Empty,
+                    LinkedInUrl = linkedIn ?? string.Empty,
+                    GitHubUrl = gitHub ?? string.Empty
+                }
+            ];
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (_status == SubmitStatus.Sending) return;
+
+        _status = SubmitStatus.Sending;
+        _errorKey = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/contact", _model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _status = SubmitStatus.Success;
+                _prefilled = false;
+                _model = new ContactMessage();
+            }
+            else
+            {
+                _status = SubmitStatus.Error;
+                _errorKey = response.StatusCode switch
+                {
+                    System.Net.HttpStatusCode.BadRequest => "Form.ErrorBadRequest",
+                    System.Net.HttpStatusCode.TooManyRequests => "Form.ErrorTooMany",
+                    _ => "Form.ErrorServer"
+                };
+            }
+        }
+        catch (HttpRequestException)
+        {
+            _status = SubmitStatus.Error;
+            _errorKey = "Form.ErrorNetwork";
+        }
+    }
+
+    private void Reset()
+    {
+        _model = new ContactMessage();
+        _status = SubmitStatus.Idle;
+        _prefilled = false;
+    }
+}

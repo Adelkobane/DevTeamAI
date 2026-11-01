@@ -1,0 +1,20 @@
+@if (Skills.Count > 0)
+{
+    <div class="accent-@Color">
+        <h4 class="group-label">@Title</h4>
+        <ul class="flex flex-wrap gap-2">
+            @foreach (var skill in Skills)
+            {
+                <li class="chip">@skill</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public List<string> Skills { get; set; } = [];
+
+    /// <summary>cyan | purple | blue | green (styr glow-färgen via .accent-*-klasserna i tailwind.css)</summary>
+    [Parameter] public string Color { get; set; } = "cyan";
+}

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Navigation & layout -->
+  <data name="Nav.Menu" xml:space="preserve"><value>Huvudmeny</value></data>
+  <data name="Nav.Team" xml:space="preserve"><value>Grundaren</value></data>
+  <data name="Nav.Projects" xml:space="preserve"><value>Produkten</value></data>
+  <data name="Nav.Contact" xml:space="preserve"><value>Kontakt</value></data>
+  <data name="Lang.Label" xml:space="preserve"><value>Språk</value></data>
+  <data name="Lang.SwitchToSv" xml:space="preserve"><value>Byt till svenska</value></data>
+  <data name="Lang.SwitchToEn" xml:space="preserve"><value>Byt till engelska</value></data>
+  <data name="Footer.BuiltWith" xml:space="preserve"><value>Byggt med</value></data>
+
+  <!-- Gemensamt -->
+  <data name="Common.Retry" xml:space="preserve"><value>Försök igen</value></data>
+
+  <!-- Hero -->
+  <data name="Hero.Badge" xml:space="preserve"><value>Tar emot nya kundprojekt</value></data>
+  <data name="Hero.TitleLead" xml:space="preserve"><value>Vi bygger din nästa applikation med</value></data>
+  <data name="Hero.TitleHighlight" xml:space="preserve"><value>AI &amp; Modern .NET</value></data>
+  <data name="Hero.IntroAnd" xml:space="preserve"><value></value></data>
+  <data name="Hero.IntroRest" xml:space="preserve"><value>– grundare och Lead AI &amp; Solutions Engineer. Du beskriver din idé – vi bygger och levererar din applikation från grunden med hjälp av modern .NET och AI.</value></data>
+  <data name="Hero.CtaContact" xml:space="preserve"><value>Kontakta Adel</value></data>
+  <data name="Hero.StackLabel" xml:space="preserve"><value>Tjänster och kapacitet</value></data>
+
+  <!-- Utvecklarprofiler -->
+  <data name="Profiles.Eyebrow" xml:space="preserve"><value>Grundaren</value></data>
+  <data name="Profiles.Title" xml:space="preserve"><value>Möt grundaren bakom DevTeam AI</value></data>
+  <data name="Profiles.Subtitle" xml:space="preserve"><value>Adel Kobansson, Lead AI &amp; Solutions Engineer – du beskriver din idé, han bygger och levererar applikationen från grunden.</value></data>
+  <data name="Profiles.Loading" xml:space="preserve"><value>Laddar profiler</value></data>
+  <data name="Profiles.ErrorTitle" xml:space="preserve"><value>Kunde inte hämta profilerna</value></data>
+  <data name="Profiles.ErrorHint" xml:space="preserve"><value>Kontrollera att API:et körs på {0}.</value></data>
+  <data name="Profiles.Empty" xml:space="preserve"><value>Inga profiler hittades.</value></data>
+  <data name="Skills.Frontend" xml:space="preserve"><value>Frontend</value></data>
+  <data name="Skills.Backend" xml:space="preserve"><value>Backend</value></data>
+  <data name="Skills.Cloud" xml:space="preserve"><value>Cloud &amp; DevOps</value></data>
+  <data name="Skills.Quality" xml:space="preserve"><value>Kvalitet &amp; arbetssätt</value></data>
+
+  <!-- Projekt -->
+  <data name="Projects.Eyebrow" xml:space="preserve"><value>Produkten</value></data>
+  <data name="Projects.Title" xml:space="preserve"><value>DevTeam AI AppBuilder</value></data>
+  <data name="Projects.Subtitle" xml:space="preserve"><value>Du beskriver din idé – vi bygger och levererar din applikation från grunden med hjälp av modern .NET och AI.</value></data>
+  <data name="Projects.Loading" xml:space="preserve"><value>Laddar projekt</value></data>
+  <data name="Projects.ErrorTitle" xml:space="preserve"><value>Kunde inte hämta projekten</value></data>
+  <data name="Projects.Empty" xml:space="preserve"><value>Inga projekt att visa ännu.</value></data>
+  <data name="Projects.FilterLabel" xml:space="preserve"><value>Filtrera projekt på teknik</value></data>
+  <data name="Projects.FilterAll" xml:space="preserve"><value>Alla</value></data>
+  <data name="Projects.Showing" xml:space="preserve"><value>Visar {0} av {1} projekt</value></data>
+  <data name="Projects.ShowingWith" xml:space="preserve"><value>Visar {0} av {1} projekt med {2}</value></data>
+  <data name="Projects.NoMatch" xml:space="preserve"><value>Inga projekt matchar filtret.</value></data>
+  <data name="Projects.ScreenshotAlt" xml:space="preserve"><value>Skärmbild av {0}</value></data>
+  <data name="Projects.Featured" xml:space="preserve"><value>Egen AI-produkt</value></data>
+  <data name="Projects.TryBuilder" xml:space="preserve"><value>Prova AppBuilder</value></data>
+  <data name="Projects.GitHub" xml:space="preserve"><value>GitHub</value></data>
+  <data name="Projects.LiveDemo" xml:space="preserve"><value>Live demo</value></data>
+
+  <!-- Kontakt -->
+  <data name="Contact.Eyebrow" xml:space="preserve"><value>Kontakt</value></data>
+  <data name="Contact.Title" xml:space="preserve"><value>Berätta om din idé</value></data>
+  <data name="Contact.Subtitle" xml:space="preserve"><value>Har du en idé eller ett projekt du vill förverkliga? Skicka ett meddelande eller hör av dig direkt.</value></data>
+  <data name="Contact.DirectTitle" xml:space="preserve"><value>Direktkontakt</value></data>
+  <data name="Contact.DirectText" xml:space="preserve"><value>Hör av dig direkt till Adel – mejla, ring eller hitta honom på LinkedIn och GitHub.</value></data>
+  <data name="Contact.EmailLabel" xml:space="preserve"><value>E-post</value></data>
+  <data name="Contact.EmailAria" xml:space="preserve"><value>Skicka e-post till {0}</value></data>
+  <data name="Contact.PhoneLabel" xml:space="preserve"><value>Telefon</value></data>
+  <data name="Contact.CallAria" xml:space="preserve"><value>Ring {0} på {1}</value></data>
+  <data name="Contact.CopyEmail" xml:space="preserve"><value>Kopiera e-post</value></data>
+  <data name="Contact.CopyEmailAria" xml:space="preserve"><value>Kopiera {0}s e-postadress</value></data>
+  <data name="Contact.Copied" xml:space="preserve"><value>Kopierat!</value></data>
+  <data name="Contact.CopyFailed" xml:space="preserve"><value>Kunde inte kopiera</value></data>
+  <data name="Contact.CopiedAnnounce" xml:space="preserve"><value>E-postadressen kopierades till urklipp</value></data>
+  <data name="Profile.GitHubAria" xml:space="preserve"><value>Öppna {0}s GitHub-profil (öppnas i ny flik)</value></data>
+  <data name="Profile.LinkedInAria" xml:space="preserve"><value>Öppna {0}s LinkedIn-profil (öppnas i ny flik)</value></data>
+  <data name="Contact.Point1" xml:space="preserve"><value>Baserad i Stockholm</value></data>
+  <data name="Contact.Point2" xml:space="preserve"><value>Tar emot nya kundprojekt</value></data>
+  <data name="Contact.Point3" xml:space="preserve"><value>Vi återkommer så snart vi kan</value></data>
+
+  <!-- Systemstatus (hero) -->
+  <data name="Status.Title" xml:space="preserve"><value>Systemstatus</value></data>
+  <data name="Status.Checking" xml:space="preserve"><value>Kontrollerar…</value></data>
+  <data name="Status.Api.Online" xml:space="preserve"><value>API Online</value></data>
+  <data name="Status.Api.Offline" xml:space="preserve"><value>API Offline</value></data>
+  <data name="Status.Azure.Live" xml:space="preserve"><value>Azure Live</value></data>
+  <data name="Status.Azure.Local" xml:space="preserve"><value>Lokal miljö</value></data>
+  <data name="Status.Ai.Active" xml:space="preserve"><value>AI-modell aktiv</value></data>
+  <data name="Status.Ai.Standby" xml:space="preserve"><value>AI-modell i viloläge</value></data>
+  <data name="Status.Unknown" xml:space="preserve"><value>{0}: okänd</value></data>
+
+  <!-- Kontaktformulär -->
+  <data name="Form.Name" xml:space="preserve"><value>Namn</value></data>
+  <data name="Form.NamePlaceholder" xml:space="preserve"><value>Ditt namn</value></data>
+  <data name="Form.Email" xml:space="preserve"><value>E-post</value></data>
+  <data name="Form.EmailPlaceholder" xml:space="preserve"><value>namn@foretag.se</value></data>
+  <data name="Form.Message" xml:space="preserve"><value>Meddelande</value></data>
+  <data name="Form.MessagePlaceholder" xml:space="preserve"><value>Beskriv din idé eller ditt projekt...</value></data>
+  <data name="Form.Submit" xml:space="preserve"><value>Skicka meddelande</value></data>
+  <data name="Form.Sending" xml:space="preserve"><value>Skickar...</value></data>
+  <data name="Form.SuccessTitle" xml:space="preserve"><value>Tack för ditt meddelande!</value></data>
+  <data name="Form.SuccessText" xml:space="preserve"><value>Vi hör av oss så snart vi kan.</value></data>
+  <data name="Form.SendAnother" xml:space="preserve"><value>Skicka ett till</value></data>
+  <data name="Form.ErrorBadRequest" xml:space="preserve"><value>Meddelandet kunde inte skickas. Kontrollera uppgifterna och försök igen.</value></data>
+  <data name="Form.ErrorTooMany" xml:space="preserve"><value>Du har skickat för många meddelanden på kort tid. Vänta en minut och försök igen.</value></data>
+  <data name="Form.ErrorServer" xml:space="preserve"><value>Något gick fel på servern. Försök igen om en stund.</value></data>
+  <data name="Form.ErrorNetwork" xml:space="preserve"><value>Kunde inte nå servern. Kontrollera din anslutning och försök igen.</value></data>
+
+  <!-- Valideringsmeddelanden (nycklar används i ContactMessage-modellen) -->
+  <data name="Validation.NameRequired" xml:space="preserve"><value>Namn är obligatoriskt.</value></data>
+  <data name="Validation.NameLength" xml:space="preserve"><value>Namnet får vara högst 100 tecken.</value></data>
+  <data name="Validation.EmailRequired" xml:space="preserve"><value>E-post är obligatoriskt.</value></data>
+  <data name="Validation.EmailInvalid" xml:space="preserve"><value>Ange en giltig e-postadress.</value></data>
+  <data name="Validation.EmailLength" xml:space="preserve"><value>E-postadressen får vara högst 200 tecken.</value></data>
+  <data name="Validation.MessageRequired" xml:space="preserve"><value>Meddelande är obligatoriskt.</value></data>
+  <data name="Validation.MessageLength" xml:space="preserve"><value>Meddelandet måste vara mellan 10 och 60 000 tecken.</value></data>
+
+  <!-- DevTeam AI (assistent) -->
+  <data name="Ai.Title" xml:space="preserve"><value>DevTeam AI</value></data>
+  <data name="Ai.Subtitle" xml:space="preserve"><value>Svarar utifrån informationen på sidan</value></data>
+  <data name="Ai.Fab" xml:space="preserve"><value>Fråga DevTeam AI</value></data>
+  <data name="Ai.Open" xml:space="preserve"><value>Öppna AI-assistenten</value></data>
+  <data name="Ai.Close" xml:space="preserve"><value>Stäng</value></data>
+  <data name="Ai.TabChat" xml:space="preserve"><value>Chatt</value></data>
+  <data name="Ai.TabMatch" xml:space="preserve"><value>Matcha jobbannons</value></data>
+  <data name="Ai.Welcome" xml:space="preserve"><value>Hej! Jag är DevTeam AI. Fråga mig om Adel Kobansson, AppBuilder och hur vi bygger din applikation – eller prova ett av förslagen nedan.</value></data>
+  <data name="Ai.QuickLabel" xml:space="preserve"><value>Förslag på frågor</value></data>
+  <data name="Ai.Quick1" xml:space="preserve"><value>Vad är Adels spetskompetens?</value></data>
+  <data name="Ai.Quick2" xml:space="preserve"><value>Berätta om AppBuilder</value></data>
+  <data name="Ai.Quick3" xml:space="preserve"><value>Hur bygger ni min app?</value></data>
+  <data name="Ai.Quick4" xml:space="preserve"><value>Hur kan jag kontakta Adel?</value></data>
+  <data name="Ai.InputLabel" xml:space="preserve"><value>Din fråga</value></data>
+  <data name="Ai.InputPlaceholder" xml:space="preserve"><value>Ställ en fråga...</value></data>
+  <data name="Ai.Send" xml:space="preserve"><value>Skicka</value></data>
+  <data name="Ai.Stop" xml:space="preserve"><value>Stoppa svaret</value></data>
+  <data name="Ai.Clear" xml:space="preserve"><value>Rensa chatten</value></data>
+  <data name="Ai.You" xml:space="preserve"><value>Du</value></data>
+  <data name="Ai.Assistant" xml:space="preserve"><value>DevTeam AI</value></data>
+  <data name="Ai.Typing" xml:space="preserve"><value>DevTeam AI skriver</value></data>
+  <data name="Ai.ErrorRate" xml:space="preserve"><value>Du har ställt många frågor på kort tid. Försök igen om {0} sekunder.</value></data>
+  <data name="Ai.ErrorRateNoTime" xml:space="preserve"><value>Du har ställt många frågor på kort tid. Försök igen om en stund.</value></data>
+  <data name="Ai.ErrorUnavailable" xml:space="preserve"><value>AI-assistenten är inte tillgänglig just nu. Försök igen senare.</value></data>
+  <data name="Ai.ErrorBad" xml:space="preserve"><value>Texten kunde inte behandlas. Kontrollera den och försök igen.</value></data>
+  <data name="Ai.ErrorNetwork" xml:space="preserve"><value>Kunde inte nå servern. Kontrollera din anslutning och försök igen.</value></data>
+  <data name="Ai.ErrorGeneric" xml:space="preserve"><value>Något gick fel med AI-assistenten. Försök igen.</value></data>
+  <data name="Ai.Match.Intro" xml:space="preserve"><value>Klistra in rollbeskrivningen eller kravprofilen, så analyserar AI:n hur väl Adel matchar rollen.</value></data>
+  <data name="Ai.Match.Label" xml:space="preserve"><value>Jobbannons / kravprofil</value></data>
+  <data name="Ai.Match.Placeholder" xml:space="preserve"><value>Klistra in annonsen här...</value></data>
+  <data name="Ai.Match.Counter" xml:space="preserve"><value>{0} / {1} tecken</value></data>
+  <data name="Ai.Match.MinHint" xml:space="preserve"><value>Minst {0} tecken behövs.</value></data>
+  <data name="Ai.Match.Analyze" xml:space="preserve"><value>Analysera matchning</value></data>
+  <data name="Ai.Match.Analyzing" xml:space="preserve"><value>Analyserar...</value></data>
+  <data name="Ai.Match.Score" xml:space="preserve"><value>Matchning</value></data>
+  <data name="Ai.Match.Verdict.High" xml:space="preserve"><value>Stark matchning</value></data>
+  <data name="Ai.Match.Verdict.Good" xml:space="preserve"><value>God matchning</value></data>
+  <data name="Ai.Match.Verdict.Partial" xml:space="preserve"><value>Delvis matchning</value></data>
+  <data name="Ai.Match.Verdict.Low" xml:space="preserve"><value>Svag matchning</value></data>
+  <data name="Ai.Match.Strengths" xml:space="preserve"><value>Nyckelstyrkor</value></data>
+  <data name="Ai.Match.Gaps" xml:space="preserve"><value>Att tänka på</value></data>
+  <data name="Ai.Match.Reasoning" xml:space="preserve"><value>Motivering</value></data>
+  <data name="Ai.Match.Again" xml:space="preserve"><value>Ny analys</value></data>
+  <data name="Ai.Match.Disclaimer" xml:space="preserve"><value>AI-genererad analys utifrån Adels profil på sidan. Kontrollera alltid viktiga krav själv.</value></data>
+
+  <!-- 404 -->
+  <data name="NotFound.Title" xml:space="preserve"><value>Sidan hittades inte</value></data>
+  <data name="NotFound.Text" xml:space="preserve"><value>Sidan du letar efter finns inte.</value></data>
+  <data name="NotFound.Home" xml:space="preserve"><value>Till startsidan</value></data>
+  <data name="Nav.Builder" xml:space="preserve"><value>App Builder</value></data>
+  <data name="Builder.Eyebrow" xml:space="preserve"><value>AI App Builder</value></data>
+  <data name="Builder.Title" xml:space="preserve"><value>Från App-idé till Prototyp på 10 sekunder</value></data>
+  <data name="Builder.Subtitle" xml:space="preserve"><value>Du beskriver din idé – vi bygger och levererar din applikation från grunden med hjälp av modern .NET och AI. Börja med en projektspecifikation: funktioner, datamodell, skärmskisser och tidsplan, redo att diskutera med Adel.</value></data>
+  <data name="Builder.IdeaLabel" xml:space="preserve"><value>Din app-idé</value></data>
+  <data name="Builder.IdeaPlaceholder" xml:space="preserve"><value>T.ex. en app där frisörer kan ta emot bokningar, skicka påminnelser och ta betalt i förväg...</value></data>
+  <data name="Builder.QuickLabel" xml:space="preserve"><value>Snabbval</value></data>
+  <data name="Builder.Counter" xml:space="preserve"><value>{0} / {1} tecken</value></data>
+  <data name="Builder.MinHint" xml:space="preserve"><value>Beskriv idén med minst {0} tecken.</value></data>
+  <data name="Builder.Generate" xml:space="preserve"><value>Generera blueprint</value></data>
+  <data name="Builder.Generating" xml:space="preserve"><value>Genererar...</value></data>
+  <data name="Builder.Loading" xml:space="preserve"><value>AI:n designar din blueprint...</value></data>
+  <data name="Builder.Reset" xml:space="preserve"><value>Ny idé</value></data>
+  <data name="Builder.Disclaimer" xml:space="preserve"><value>AI-genererat förslag. Tidsplanen är en indikativ uppskattning, inte en fast offert – Adel går igenom den med dig.</value></data>
+  <data name="Builder.Error.NotAnIdea" xml:space="preserve"><value>Det där ser inte ut som en app-idé. Beskriv vad appen ska göra och vem den är till för, så försöker vi igen.</value></data>
+  <data name="Builder.Preset.Booking" xml:space="preserve"><value>Bokningssystem</value></data>
+  <data name="Builder.Preset.Booking.Idea" xml:space="preserve"><value>Ett bokningssystem där kunder kan se lediga tider, boka online och få påminnelser, och där företaget kan hantera sitt schema och sina kunder.</value></data>
+  <data name="Builder.Preset.Saas" xml:space="preserve"><value>SaaS-plattform</value></data>
+  <data name="Builder.Preset.Saas.Idea" xml:space="preserve"><value>En SaaS-plattform för flera kunder (multi-tenant) med prenumerationsplaner, användarroller och en dashboard med statistik för varje kund.</value></data>
+  <data name="Builder.Preset.Shop" xml:space="preserve"><value>E-handel</value></data>
+  <data name="Builder.Preset.Shop.Idea" xml:space="preserve"><value>En e-handelsbutik med produktkatalog, varukorg, kassa med kortbetalning och en adminpanel för att hantera produkter, lager och ordrar.</value></data>
+  <data name="Builder.Tabs.Label" xml:space="preserve"><value>Blueprint</value></data>
+  <data name="Builder.Tab.Overview" xml:space="preserve"><value>Översikt &amp; Offert</value></data>
+  <data name="Builder.Tab.Data" xml:space="preserve"><value>Databas &amp; Arkitektur</value></data>
+  <data name="Builder.Tab.Prototype" xml:space="preserve"><value>Live Prototyp</value></data>
+  <data name="Builder.Tab.Source" xml:space="preserve"><value>Källkod</value></data>
+  <data name="Builder.Tab.Book" xml:space="preserve"><value>Kontakta Adel</value></data>
+  <data name="Builder.Overview.Summary" xml:space="preserve"><value>Projektöversikt</value></data>
+  <data name="Builder.Overview.Stories" xml:space="preserve"><value>Nyckelfunktioner</value></data>
+  <data name="Builder.Overview.TechTitle" xml:space="preserve"><value>Tjänster och kapacitet</value></data>
+  <data name="Builder.Overview.Timeline" xml:space="preserve"><value>Tidsplan</value></data>
+  <data name="Builder.Overview.Total" xml:space="preserve"><value>ca {0} veckor totalt</value></data>
+  <data name="Builder.Overview.Week" xml:space="preserve"><value>Vecka {0}</value></data>
+  <data name="Builder.Overview.WeekRange" xml:space="preserve"><value>Vecka {0}–{1}</value></data>
+  <data name="Builder.Overview.Indicative" xml:space="preserve"><value>Indikativ uppskattning – inte en fast offert. Pris och exakt omfattning bestäms tillsammans med Adel efter ett kort möte.</value></data>
+  <data name="Builder.Overview.Cta" xml:space="preserve"><value>Kontakta Adel</value></data>
+  <data name="Builder.Arch.Title" xml:space="preserve"><value>Arkitektur</value></data>
+  <data name="Builder.Arch.Client" xml:space="preserve"><value>Klient i webbläsaren</value></data>
+  <data name="Builder.Arch.Db" xml:space="preserve"><value>{0} tabeller</value></data>
+  <data name="Builder.Arch.Hosting" xml:space="preserve"><value>Levereras som Docker-containrar på Azure</value></data>
+  <data name="Builder.Arch.Extras" xml:space="preserve"><value>Kompletterande tekniker</value></data>
+  <data name="Builder.Data.Title" xml:space="preserve"><value>Datamodell</value></data>
+  <data name="Builder.Data.FieldCount" xml:space="preserve"><value>{0} fält</value></data>
+  <data name="Builder.Data.Fields" xml:space="preserve"><value>Fält</value></data>
+  <data name="Builder.Data.Field" xml:space="preserve"><value>Fält</value></data>
+  <data name="Builder.Data.Type" xml:space="preserve"><value>Typ</value></data>
+  <data name="Builder.Data.Note" xml:space="preserve"><value>Anm.</value></data>
+  <data name="Builder.Data.Relations" xml:space="preserve"><value>Relationer</value></data>
+  <data name="Builder.Data.NoRelations" xml:space="preserve"><value>Inga relationer.</value></data>
+  <data name="Builder.Data.ShowSql" xml:space="preserve"><value>Visa SQL</value></data>
+  <data name="Builder.Data.HideSql" xml:space="preserve"><value>Visa fält</value></data>
+  <data name="Builder.Data.SqlNote" xml:space="preserve"><value>Illustrativt PostgreSQL-schema – detaljerna finslipas tillsammans i projektet.</value></data>
+  <data name="Builder.Proto.Hint" xml:space="preserve"><value>Klicka dig mellan appens huvudvyer. Skissen visar vilka komponenter varje vy innehåller.</value></data>
+  <data name="Builder.Preview.Fullscreen" xml:space="preserve"><value>Öppna i helskärm</value></data>
+  <data name="Builder.Preview.FrameTitle" xml:space="preserve"><value>Live-prototyp av {0}</value></data>
+  <data name="Builder.Preview.ReviseTitle" xml:space="preserve"><value>Ändra din prototyp i realtid</value></data>
+  <data name="Builder.Preview.ReviseLabel" xml:space="preserve"><value>Ändring</value></data>
+  <data name="Builder.Preview.RevisePlaceholder" xml:space="preserve"><value>Beskriv vad som ska ändras...</value></data>
+  <data name="Builder.Preview.ReviseNote" xml:space="preserve"><value>Ändringen ritas om i förhandsvisningen direkt. Översikt och tidsplan påverkas inte.</value></data>
+  <data name="Builder.Preview.ReviseSend" xml:space="preserve"><value>Uppdatera prototypen</value></data>
+  <data name="Builder.Preview.Revising" xml:space="preserve"><value>Uppdaterar prototypen...</value></data>
+  <data name="Builder.Preview.Updated" xml:space="preserve"><value>Prototypen är uppdaterad.</value></data>
+  <data name="Builder.Preview.Chip.Dark" xml:space="preserve"><value>Byt till mörkt tema</value></data>
+  <data name="Builder.Preview.Chip.Hours" xml:space="preserve"><value>Lägg till öppettider &amp; karta</value></data>
+  <data name="Builder.Preview.Chip.Luxury" xml:space="preserve"><value>Gör designen mer lyxig</value></data>
+  <data name="Builder.Preview.Download" xml:space="preserve"><value>Ladda ner källkod (HTML/Tailwind)</value></data>
+  <data name="Builder.Preview.Deploy" xml:space="preserve"><value>Driftsätt denna app med Adel Kobansson</value></data>
+  <data name="Builder.Preview.EmptySource" xml:space="preserve"><value>Källkoden visas när en live-prototyp har genererats.</value></data>
+  <data name="Builder.Source.Copy" xml:space="preserve"><value>Kopiera källkod</value></data>
+  <data name="Builder.Source.Copied" xml:space="preserve"><value>Kopierat!</value></data>
+  <data name="Builder.Source.CopyFailed" xml:space="preserve"><value>Kunde inte kopiera</value></data>
+  <data name="Builder.Source.File" xml:space="preserve"><value>index.html</value></data>
+  <data name="Builder.Deploy.Intro" xml:space="preserve"><value>Jag vill driftsätta prototypen {0} – {1} tillsammans med Adel Kobansson.</value></data>
+  <data name="Builder.Deploy.Code" xml:space="preserve"><value>Genererad källkod (HTML/Tailwind):</value></data>
+  <data name="Builder.Proto.Nav" xml:space="preserve"><value>Appens vyer</value></data>
+  <data name="Builder.Book.Title" xml:space="preserve"><value>Redo att bygga det här?</value></data>
+  <data name="Builder.Book.Text" xml:space="preserve"><value>Vi har samlat din idé, funktioner, teknik, datamodell och tidsplan i ett färdigt underlag. Skicka det till Adel, så återkommer han snabbt med nästa steg.</value></data>
+  <data name="Builder.Book.Preview" xml:space="preserve"><value>Underlag som skickas</value></data>
+  <data name="Builder.Book.Note" xml:space="preserve"><value>Du granskar och kompletterar meddelandet i kontaktformuläret innan det skickas.</value></data>
+  <data name="Builder.Book.Send" xml:space="preserve"><value>Skicka underlaget till Adel</value></data>
+  <data name="Builder.Book.Copy" xml:space="preserve"><value>Kopiera underlag</value></data>
+  <data name="Builder.Book.Copied" xml:space="preserve"><value>Kopierat!</value></data>
+  <data name="Builder.Book.CopyFailed" xml:space="preserve"><value>Kunde inte kopiera</value></data>
+  <data name="Builder.Book.OrMail" xml:space="preserve"><value>Eller mejla direkt</value></data>
+  <data name="Builder.Book.MailTo" xml:space="preserve"><value>Mejla {0}</value></data>
+  <data name="Builder.Brief.Greeting" xml:space="preserve"><value>Hej Adel!</value></data>
+  <data name="Builder.Brief.Intro" xml:space="preserve"><value>Jag vill gärna diskutera ett projekt: {0} – {1}</value></data>
+  <data name="Builder.Brief.Idea" xml:space="preserve"><value>Min idé:</value></data>
+  <data name="Builder.Brief.Summary" xml:space="preserve"><value>Sammanfattning:</value></data>
+  <data name="Builder.Brief.Features" xml:space="preserve"><value>Nyckelfunktioner:</value></data>
+  <data name="Builder.Brief.Tech" xml:space="preserve"><value>Teknik:</value></data>
+  <data name="Builder.Brief.Data" xml:space="preserve"><value>Datamodell:</value></data>
+  <data name="Builder.Brief.Screens" xml:space="preserve"><value>Huvudvyer:</value></data>
+  <data name="Builder.Brief.Timeline" xml:space="preserve"><value>Tidsplan (indikativ): {0} leveransfaser, ca {1} veckor</value></data>
+  <data name="Builder.Brief.Footer" xml:space="preserve"><value>Underlag framtaget med AI App Builder på er webbplats.</value></data>
+  <data name="Builder.Brief.MailSubject" xml:space="preserve"><value>Projektförfrågan: {0}</value></data>
+  <data name="Contact.PrefillNote" xml:space="preserve"><value>Underlaget från AI App Builder har fyllts i. Granska det, lägg till ditt namn och din e-post och skicka.</value></data>
+  <data name="Hero.CtaBuilder" xml:space="preserve"><value>Skapa din appidé nu</value></data>
+</root>

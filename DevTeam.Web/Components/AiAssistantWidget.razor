@@ -1,0 +1,511 @@
+@using DevTeam.Web.Models
+@using DevTeam.Web.Services
+@implements IDisposable
+@inject AiClient Ai
+@inject IJSRuntime JS
+@inject IStringLocalizer<Strings> L
+
+@* DevTeam AI – flytande assistent nere till höger: chatt (RAG, strömmande svar) och jobbmatchning. *@
+<div class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+
+    @if (_open)
+    {
+        <section role="dialog" aria-label="@L["Ai.Title"]" @onkeydown="OnPanelKeyDown"
+                 class="glow-surface motion-safe:animate-fade-up relative flex h-[min(34rem,calc(100dvh-7.5rem))] w-[calc(100vw-2rem)] max-w-[26rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 shadow-2xl shadow-black/60 backdrop-blur-xl transition-shadow duration-500 hover:shadow-[0_0_50px_-12px_rgba(34,211,238,0.45),0_14px_60px_-16px_rgba(168,85,247,0.5)]">
+
+            @* Accentlinje och glöd *@
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-cyan-400/80 to-transparent" aria-hidden="true"></div>
+            <div class="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-purple-500/20 blur-3xl" aria-hidden="true"></div>
+
+            @* Rubrik *@
+            <header class="relative flex items-center gap-3 border-b border-white/10 px-4 py-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-cyan-400 via-blue-500 to-purple-500 text-white shadow-lg shadow-cyan-500/30">
+                    <SparkleIcon CssClass="h-5 w-5" />
+                </span>
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-sm font-bold leading-tight text-white">@L["Ai.Title"]</h2>
+                    <p class="truncate text-xs text-zinc-400">@L["Ai.Subtitle"]</p>
+                </div>
+                @if (_tab == Tab.Chat && _messages.Count > 0 && !_streaming)
+                {
+                    <button type="button" @onclick="ClearChat" title="@L["Ai.Clear"]" aria-label="@L["Ai.Clear"]"
+                            class="rounded-lg p-2 text-zinc-400 transition hover:bg-white/10 hover:text-white">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.74 9l-.35 9m-4.78 0L9.26 9m9.97-3.21c.34.05.68.11 1.02.17m-1.02-.17L18.16 19.67a2.25 2.25 0 01-2.24 2.08H8.08a2.25 2.25 0 01-2.24-2.08L4.77 5.79m14.46 0a48.11 48.11 0 00-3.48-.4m-12 .57c.34-.06.68-.12 1.02-.17m0 0a48.11 48.11 0 013.48-.4m7.5 0v-.92c0-1.18-.91-2.16-2.09-2.2a51.96 51.96 0 00-3.32 0c-1.18.04-2.09 1.02-2.09 2.2v.92m7.5 0a48.67 48.67 0 00-7.5 0" /></svg>
+                    </button>
+                }
+                <button type="button" @onclick="Close" title="@L["Ai.Close"]" aria-label="@L["Ai.Close"]"
+                        class="rounded-lg p-2 text-zinc-400 transition hover:bg-white/10 hover:text-white">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </header>
+
+            @* Flikar *@
+            <div role="tablist" aria-label="@L["Ai.Title"]" class="relative grid grid-cols-2 gap-1 border-b border-white/10 p-1.5">
+                <button type="button" role="tab" id="ai-tab-chat" aria-selected="@(_tab == Tab.Chat ? "true" : "false")" aria-controls="ai-panel-chat"
+                        @onclick="() => SelectTab(Tab.Chat)"
+                        class="rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-300 @(_tab == Tab.Chat ? ActiveTab : InactiveTab)">
+                    @L["Ai.TabChat"]
+                </button>
+                <button type="button" role="tab" id="ai-tab-match" aria-selected="@(_tab == Tab.Match ? "true" : "false")" aria-controls="ai-panel-match"
+                        @onclick="() => SelectTab(Tab.Match)"
+                        class="rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-300 @(_tab == Tab.Match ? ActiveTab : InactiveTab)">
+                    @L["Ai.TabMatch"]
+                </button>
+            </div>
+
+            @if (_tab == Tab.Chat)
+            {
+                @* ───────────── Flik 1: Chatt ───────────── *@
+                <div id="ai-panel-chat" role="tabpanel" aria-labelledby="ai-tab-chat" class="relative flex min-h-0 flex-1 flex-col">
+                    <div @ref="_logRef" role="log" aria-live="polite" aria-busy="@(_streaming ? "true" : "false")"
+                         class="flex-1 space-y-3 overflow-y-auto px-4 py-4 [scrollbar-width:thin]">
+
+                        @* Välkomstmeddelande (skickas aldrig till API:et) *@
+                        <div class="flex gap-2">
+                            <div class="max-w-[88%] rounded-2xl rounded-tl-md border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm leading-relaxed text-zinc-200">
+                                @L["Ai.Welcome"]
+                            </div>
+                        </div>
+
+                        @if (_messages.Count == 0)
+                        {
+                            <div class="flex flex-wrap gap-2 pt-1" role="group" aria-label="@L["Ai.QuickLabel"]">
+                                @foreach (var key in QuickKeys)
+                                {
+                                    var text = L[key].Value;
+                                    <button type="button" @onclick="() => SendAsync(text)"
+                                            class="chip accent-cyan cursor-pointer text-left">
+                                        @text
+                                    </button>
+                                }
+                            </div>
+                        }
+
+                        @foreach (var message in _messages)
+                        {
+                            if (message.Role == "user")
+                            {
+                                <div class="flex justify-end">
+                                    <div class="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-tr-md bg-linear-to-br from-cyan-500/80 to-purple-600/80 px-3.5 py-2.5 text-sm leading-relaxed text-white shadow-lg shadow-cyan-500/10">
+                                        <span class="sr-only">@L["Ai.You"]: </span>@message.Content
+                                    </div>
+                                </div>
+                            }
+                            else if (message.IsError)
+                            {
+                                <div class="flex gap-2" role="alert">
+                                    <div class="max-w-[88%] rounded-2xl rounded-tl-md border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm leading-relaxed text-red-200">
+                                        @message.Content
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex gap-2">
+                                    <div class="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-tl-md border border-white/10 bg-white/[0.06] px-3.5 py-2.5 text-sm leading-relaxed text-zinc-200">
+                                        <span class="sr-only">@L["Ai.Assistant"]: </span>
+                                        @if (message.Content.Length == 0)
+                                        {
+                                            <span class="inline-flex items-center gap-1 py-1" role="status" aria-label="@L["Ai.Typing"]">
+                                                <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 motion-safe:animate-bounce"></span>
+                                                <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 motion-safe:animate-bounce [animation-delay:150ms]"></span>
+                                                <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 motion-safe:animate-bounce [animation-delay:300ms]"></span>
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @message.Content
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <form @onsubmit="() => SendAsync(null)" @onsubmit:preventDefault class="flex items-center gap-2 border-t border-white/10 p-3">
+                        <label for="ai-input" class="sr-only">@L["Ai.InputLabel"]</label>
+                        <input id="ai-input" @ref="_inputRef" @bind="_input" @bind:event="oninput" type="text" autocomplete="off"
+                               maxlength="@MaxMessageLength" placeholder="@L["Ai.InputPlaceholder"]" disabled="@_streaming"
+                               class="field !mt-0 !py-2.5 text-base disabled:opacity-60 sm:text-sm" />
+                        @if (_streaming)
+                        {
+                            <button type="button" @onclick="StopStreaming" title="@L["Ai.Stop"]" aria-label="@L["Ai.Stop"]"
+                                    class="btn btn-glass shrink-0 !px-3 !py-2.5">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" title="@L["Ai.Send"]" aria-label="@L["Ai.Send"]" disabled="@(string.IsNullOrWhiteSpace(_input))"
+                                    class="btn btn-gradient shrink-0 !px-3 !py-2.5 disabled:cursor-not-allowed disabled:opacity-50">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12L3.27 3.13a.75.75 0 011.04-.89l17.5 8.25a.75.75 0 010 1.36l-17.5 8.25a.75.75 0 01-1.04-.89L6 12zm0 0h7.5" /></svg>
+                            </button>
+                        }
+                    </form>
+                </div>
+            }
+            else
+            {
+                @* ───────────── Flik 2: Matcha jobbannons ───────────── *@
+                <div id="ai-panel-match" role="tabpanel" aria-labelledby="ai-tab-match" class="relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 [scrollbar-width:thin]">
+                    @if (_result is not null)
+                    {
+                        <div class="space-y-5" aria-live="polite">
+                            <div class="flex items-center gap-4">
+                                <div class="relative h-24 w-24 shrink-0">
+                                    <svg class="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="9" class="text-white/10" />
+                                        <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"
+                                                class="@ScoreColor(_result.Score) transition-all duration-700 drop-shadow-[0_0_8px_currentColor]"
+                                                stroke-dasharray="@CircumferenceText"
+                                                stroke-dashoffset="@DashOffset(_result.Score)" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-2xl font-extrabold leading-none text-white">@_result.Score%</span>
+                                    </div>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">@L["Ai.Match.Score"]</p>
+                                    <p class="mt-1 text-lg font-bold leading-tight @ScoreColor(_result.Score)">@L[VerdictKey(_result.Score)]</p>
+                                </div>
+                            </div>
+
+                            @if (_result.Strengths.Count > 0)
+                            {
+                                <div>
+                                    <h3 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-300/80">@L["Ai.Match.Strengths"]</h3>
+                                    <ul class="mt-2 space-y-2">
+                                        @foreach (var strength in _result.Strengths)
+                                        {
+                                            <li class="flex gap-2 text-sm leading-snug text-zinc-200">
+                                                <svg class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.75l6 6 9-13.5" /></svg>
+                                                <span>@strength</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            @if (_result.Gaps.Count > 0)
+                            {
+                                <div>
+                                    <h3 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">@L["Ai.Match.Gaps"]</h3>
+                                    <ul class="mt-2 space-y-2">
+                                        @foreach (var gap in _result.Gaps)
+                                        {
+                                            <li class="flex gap-2 text-sm leading-snug text-zinc-300">
+                                                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400 shadow-[0_0_8px] shadow-amber-400" aria-hidden="true"></span>
+                                                <span>@gap</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(_result.Reasoning))
+                            {
+                                <div>
+                                    <h3 class="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">@L["Ai.Match.Reasoning"]</h3>
+                                    <p class="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">@_result.Reasoning</p>
+                                </div>
+                            }
+
+                            <p class="text-xs leading-snug text-zinc-500">@L["Ai.Match.Disclaimer"]</p>
+
+                            <button type="button" @onclick="ResetMatch" class="btn btn-glass w-full !py-2.5">@L["Ai.Match.Again"]</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-sm leading-relaxed text-zinc-400">@L["Ai.Match.Intro"]</p>
+
+                        <label for="ai-job" class="mt-4 block text-sm font-medium text-zinc-300">@L["Ai.Match.Label"]</label>
+                        <textarea id="ai-job" @bind="_jobText" @bind:event="oninput" rows="8" maxlength="@MatchJobMaxLength" disabled="@_matching"
+                                  placeholder="@L["Ai.Match.Placeholder"]"
+                                  class="field resize-none text-base disabled:opacity-60 sm:text-sm"></textarea>
+
+                        <div class="mt-1.5 flex items-center justify-between gap-3 text-xs">
+                            <span class="@(JobTextTooShort && _jobText.Length > 0 ? "text-amber-300" : "text-zinc-500")">
+                                @(JobTextTooShort ? L["Ai.Match.MinHint", MatchJobMinLength].Value : "")
+                            </span>
+                            <span class="text-zinc-500">@L["Ai.Match.Counter", _jobText.Length, MatchJobMaxLength]</span>
+                        </div>
+
+                        @if (_matchError is not null)
+                        {
+                            <div class="mt-3 rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-red-200" role="alert">@_matchError</div>
+                        }
+
+                        <button type="button" @onclick="MatchAsync" disabled="@(JobTextTooShort || _matching)"
+                                class="btn btn-gradient mt-4 w-full disabled:cursor-not-allowed disabled:opacity-50">
+                            @if (_matching)
+                            {
+                                <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+                                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" class="opacity-75" />
+                                </svg>
+                                <span>@L["Ai.Match.Analyzing"]</span>
+                            }
+                            else
+                            {
+                                <SparkleIcon CssClass="h-4 w-4" />
+                                <span>@L["Ai.Match.Analyze"]</span>
+                            }
+                        </button>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+    @* Flytande knapp *@
+    <button type="button" @onclick="Toggle" aria-expanded="@(_open ? "true" : "false")"
+            aria-label="@(_open ? L["Ai.Close"].Value : L["Ai.Open"].Value)"
+            class="group relative inline-flex h-14 items-center gap-2.5 rounded-full border border-white/20 bg-linear-to-r from-cyan-500 via-blue-500 to-purple-600 px-4 text-sm font-semibold text-white shadow-[0_0_30px_-4px] shadow-purple-500/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_40px_-2px] hover:shadow-cyan-400/70 sm:px-5">
+        @if (!_open)
+        {
+            <span class="absolute inset-0 -z-10 rounded-full bg-linear-to-r from-cyan-400 to-purple-500 opacity-40 blur-md motion-safe:animate-pulse" aria-hidden="true"></span>
+            <SparkleIcon CssClass="h-5 w-5" />
+            <span class="hidden sm:inline">@L["Ai.Fab"]</span>
+        }
+        else
+        {
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12" /></svg>
+            <span class="hidden sm:inline">@L["Ai.Close"]</span>
+        }
+    </button>
+</div>
+
+@code {
+    private enum Tab { Chat, Match }
+
+    private sealed class ChatMessage
+    {
+        public required string Role { get; init; }
+        public string Content { get; set; } = string.Empty;
+        public bool IsError { get; set; }
+    }
+
+    private const string ActiveTab = "bg-white/10 text-white ring-1 ring-white/15 shadow-[0_0_14px_-4px] shadow-cyan-400/60";
+    private const string InactiveTab = "text-zinc-400 hover:bg-white/5 hover:text-white";
+
+    // Samma gränser som API:et (ChatRequest / MatchJobRequest).
+    private const int MaxMessageLength = 1000;
+    private const int MaxHistoryTurns = 12;
+    private const int MatchJobMinLength = 40;
+    private const int MatchJobMaxLength = 6000;
+
+    private const double Circumference = 2 * Math.PI * 42;
+    private static readonly string CircumferenceText = Circumference.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private static readonly string[] QuickKeys = ["Ai.Quick1", "Ai.Quick2", "Ai.Quick3", "Ai.Quick4"];
+
+    private bool _open;
+    private bool _focusInput;
+    private Tab _tab = Tab.Chat;
+
+    // Chatt
+    private readonly List<ChatMessage> _messages = [];
+    private string _input = string.Empty;
+    private bool _streaming;
+    private CancellationTokenSource? _streamCts;
+    private ElementReference _logRef;
+    private ElementReference _inputRef;
+
+    // Jobbmatchning
+    private string _jobText = string.Empty;
+    private bool _matching;
+    private JobMatchResult? _result;
+    private string? _matchError;
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private bool JobTextTooShort => _jobText.Trim().Length < MatchJobMinLength;
+
+    // ------------------------------------------------------------ Öppna/stäng
+
+    private void Toggle()
+    {
+        _open = !_open;
+        _focusInput = _open;
+    }
+
+    private void Close()
+    {
+        _open = false;
+    }
+
+    private void OnPanelKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") Close();
+    }
+
+    private void SelectTab(Tab tab)
+    {
+        _tab = tab;
+        _focusInput = tab == Tab.Chat;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_focusInput && _open && _tab == Tab.Chat)
+        {
+            _focusInput = false;
+            await _inputRef.FocusAsync();
+        }
+    }
+
+    // ------------------------------------------------------------------ Chatt
+
+    private async Task SendAsync(string? text)
+    {
+        var message = (text ?? _input).Trim();
+        if (message.Length == 0 || _streaming) return;
+        if (message.Length > MaxMessageLength) message = message[..MaxMessageLength];
+
+        // Historik = tidigare lyckade tur(er) (inte felmeddelanden, inte välkomsttexten).
+        var history = _messages
+            .Where(m => !m.IsError && m.Content.Length > 0)
+            .TakeLast(MaxHistoryTurns)
+            .Select(m => new ChatTurn(m.Role, m.Content.Length > 4000 ? m.Content[..4000] : m.Content))
+            .ToList();
+
+        _messages.Add(new ChatMessage { Role = "user", Content = message });
+        var reply = new ChatMessage { Role = "assistant" };
+        _messages.Add(reply);
+
+        _input = string.Empty;
+        _streaming = true;
+        _streamCts = new CancellationTokenSource();
+        var token = _streamCts.Token;
+
+        StateHasChanged();
+        await ScrollToBottomAsync();
+
+        try
+        {
+            await foreach (var delta in Ai.StreamChatAsync(message, history, Language, token))
+            {
+                reply.Content += delta;
+                StateHasChanged();
+                await ScrollToBottomAsync();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Besökaren tryckte på Stopp. Ett tomt svar tas bort, ett delvis svar behålls.
+            if (reply.Content.Length == 0) _messages.Remove(reply);
+        }
+        catch (AiClientException ex)
+        {
+            var errorText = ErrorText(ex);
+
+            if (reply.Content.Length == 0)
+            {
+                reply.IsError = true;
+                reply.Content = errorText;
+            }
+            else
+            {
+                // Delvis svar: behåll det och lägg felet efter.
+                _messages.Add(new ChatMessage { Role = "assistant", Content = errorText, IsError = true });
+            }
+        }
+        finally
+        {
+            _streaming = false;
+            _streamCts?.Dispose();
+            _streamCts = null;
+            _focusInput = true;
+        }
+
+        StateHasChanged();
+        await ScrollToBottomAsync();
+    }
+
+    private void StopStreaming() => _streamCts?.Cancel();
+
+    private void ClearChat()
+    {
+        _messages.Clear();
+        _focusInput = true;
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("devteam.scrollToBottom", _logRef);
+        }
+        catch (Exception ex) when (ex is JSException or InvalidOperationException)
+        {
+            // Loggen är inte renderad (t.ex. fliken byttes) – ingen scroll behövs.
+        }
+    }
+
+    // ----------------------------------------------------------- Jobbmatchning
+
+    private async Task MatchAsync()
+    {
+        if (_matching || JobTextTooShort) return;
+
+        _matching = true;
+        _matchError = null;
+
+        try
+        {
+            _result = await Ai.MatchJobAsync(_jobText.Trim(), Language);
+        }
+        catch (AiClientException ex)
+        {
+            _matchError = ErrorText(ex);
+        }
+        finally
+        {
+            _matching = false;
+        }
+    }
+
+    private void ResetMatch()
+    {
+        _result = null;
+        _matchError = null;
+    }
+
+    private static string ScoreColor(int score) => score switch
+    {
+        >= 80 => "text-emerald-400",
+        >= 60 => "text-cyan-400",
+        >= 40 => "text-amber-400",
+        _ => "text-red-400"
+    };
+
+    private static string VerdictKey(int score) => score switch
+    {
+        >= 80 => "Ai.Match.Verdict.High",
+        >= 60 => "Ai.Match.Verdict.Good",
+        >= 40 => "Ai.Match.Verdict.Partial",
+        _ => "Ai.Match.Verdict.Low"
+    };
+
+    private static string DashOffset(int score) =>
+        (Circumference * (1 - Math.Clamp(score, 0, 100) / 100.0)).ToString("0.##", CultureInfo.InvariantCulture);
+
+    // ------------------------------------------------------------------ Delat
+
+    private string ErrorText(AiClientException ex) => ex.Kind switch
+    {
+        AiErrorKind.RateLimited when ex.RetryAfterSeconds is { } seconds => L["Ai.ErrorRate", seconds].Value,
+        AiErrorKind.RateLimited => L["Ai.ErrorRateNoTime"].Value,
+        AiErrorKind.Unavailable => L["Ai.ErrorUnavailable"].Value,
+        AiErrorKind.BadRequest => L["Ai.ErrorBad"].Value,
+        AiErrorKind.Network => L["Ai.ErrorNetwork"].Value,
+        _ => L["Ai.ErrorGeneric"].Value
+    };
+
+    public void Dispose()
+    {
+        _streamCts?.Cancel();
+        _streamCts?.Dispose();
+    }
+}

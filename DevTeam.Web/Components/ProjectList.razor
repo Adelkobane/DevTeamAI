@@ -1,0 +1,212 @@
+@using DevTeam.Web.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject IStringLocalizer<Strings> L
+
+<section id="projekt" class="anchor-section">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionHeader Eyebrow="@L["Projects.Eyebrow"]"
+                       Title="@L["Projects.Title"]"
+                       Subtitle="@L["Projects.Subtitle"]" />
+
+        <div class="mt-12">
+            @if (_loading)
+            {
+                <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3" aria-busy="true" aria-label="@L["Projects.Loading"]">
+                    @for (var i = 0; i < 3; i++)
+                    {
+                        <div class="animate-pulse overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+                            <div class="h-48 bg-white/5"></div>
+                            <div class="space-y-3 p-6">
+                                <div class="h-5 w-1/2 rounded bg-white/10"></div>
+                                <div class="h-3 w-full rounded bg-white/5"></div>
+                                <div class="h-3 w-5/6 rounded bg-white/5"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_error is not null)
+            {
+                <div class="mx-auto max-w-xl rounded-2xl border border-red-500/30 bg-red-500/10 p-8 text-center backdrop-blur-md" role="alert">
+                    <h3 class="text-lg font-semibold text-red-200">@L["Projects.ErrorTitle"]</h3>
+                    <p class="mt-2 text-sm text-red-300/80">@_error</p>
+                    <button @onclick="LoadProjectsAsync" class="btn btn-glass mt-5 !py-2">@L["Common.Retry"]</button>
+                </div>
+            }
+            else if (_projects.Count == 0)
+            {
+                <p class="text-center text-zinc-500">@L["Projects.Empty"]</p>
+            }
+            else
+            {
+                @if (_projects.Count > 1)
+                {
+                    <div class="mb-10 flex flex-col items-center gap-4" data-reveal>
+                        <div class="flex flex-wrap justify-center gap-2" role="group" aria-label="@L["Projects.FilterLabel"]">
+                            <button type="button" class="chip accent-cyan" aria-pressed="@(_selectedTech is null ? "true" : "false")"
+                                    @onclick="() => SelectTech(null)">
+                                @L["Projects.FilterAll"]
+                            </button>
+                            @foreach (var tech in _allTech)
+                            {
+                                var t = tech;
+                                <button type="button" class="chip @AccentFor(t)" aria-pressed="@(_selectedTech == t ? "true" : "false")"
+                                        @onclick="() => SelectTech(t)">
+                                    @t
+                                </button>
+                            }
+                        </div>
+                        <p class="text-sm text-zinc-500" aria-live="polite">
+                            @(_selectedTech is null
+                                ? L["Projects.Showing", Visible.Count, _projects.Count]
+                                : L["Projects.ShowingWith", Visible.Count, _projects.Count, _selectedTech])
+                        </p>
+                    </div>
+                }
+
+                @if (Visible.Count == 0)
+                {
+                    <p class="text-center text-zinc-500">@L["Projects.NoMatch"]</p>
+                }
+                else
+                {
+                    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        @foreach (var (project, index) in Visible.Select((p, i) => (p, i)))
+                        {
+                            @* @key bevarar DOM-noden per projekt vid filtrering; nya kort tonas in via scroll-reveal. *@
+                            <article @key="project.Title" data-reveal style="--reveal-delay:@((index % 3) * 100)ms"
+                                     class="glass-card group flex flex-col overflow-hidden @AccentFor(project.Title) @(project.Featured ? "featured-card glow-surface order-first md:col-span-2 md:flex-row lg:col-span-3" : "")">
+                                @* Bild eller vektorbaserad platshållare *@
+                                <div class="relative h-48 overflow-hidden border-b border-white/10 bg-zinc-900 @(project.Featured ? "md:h-auto md:min-h-72 md:w-2/5 md:shrink-0 md:border-b-0 md:border-r" : "")">
+                                    @if (!string.IsNullOrWhiteSpace(project.ImageUrl))
+                                    {
+                                        <img src="@project.ImageUrl" alt="@L["Projects.ScreenshotAlt", project.Title]" loading="lazy"
+                                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <div class="absolute inset-0 bg-linear-to-t from-zinc-950/70 via-transparent to-transparent"></div>
+                                    }
+                                    else
+                                    {
+                                        <ProjectCoverArt Title="@project.Title" Featured="project.Featured" />
+                                    }
+                                </div>
+
+                                <div class="flex flex-1 flex-col p-5 sm:p-6 @(project.Featured ? "md:justify-center md:p-8 lg:p-10" : "")">
+                                    @if (project.Featured)
+                                    {
+                                        <span class="chip accent-green mb-4 w-fit">
+                                            <SparkleIcon CssClass="h-3.5 w-3.5" />
+                                            @L["Projects.Featured"]
+                                        </span>
+                                    }
+                                    <h3 class="@(project.Featured ? "text-2xl sm:text-3xl" : "text-xl") font-bold tracking-tight text-white">@project.Title</h3>
+                                    <p class="mt-2 leading-relaxed text-zinc-400 @(project.Featured ? "sm:text-lg" : "")">@project.Description</p>
+
+                                    @if (project.TechStack.Count > 0)
+                                    {
+                                        <ul class="mt-5 flex flex-wrap gap-2">
+                                            @foreach (var tech in project.TechStack)
+                                            {
+                                                <li class="chip @AccentFor(tech)">@tech</li>
+                                            }
+                                        </ul>
+                                    }
+
+                                    @if (project.Featured)
+                                    {
+                                        <div class="pt-6">
+                                            <a href="@Navigation.AnchorHref("appbyggare")" class="btn btn-gradient w-full !py-3 sm:w-auto">
+                                                <SparkleIcon CssClass="h-4 w-4" />
+                                                @L["Projects.TryBuilder"]
+                                            </a>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrWhiteSpace(project.GitHubUrl) || !string.IsNullOrWhiteSpace(project.LiveDemoUrl))
+                                    {
+                                        <div class="mt-auto flex gap-3 pt-6">
+                                            @if (!string.IsNullOrWhiteSpace(project.GitHubUrl))
+                                            {
+                                                <a href="@project.GitHubUrl" target="_blank" rel="noopener noreferrer" class="btn btn-glass flex-1 !py-2.5">
+                                                    <svg class="h-4 w-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                                                    </svg>
+                                                    @L["Projects.GitHub"]
+                                                </a>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(project.LiveDemoUrl))
+                                            {
+                                                <a href="@project.LiveDemoUrl" target="_blank" rel="noopener noreferrer" class="btn btn-gradient flex-1 !py-2.5">
+                                                    @L["Projects.LiveDemo"]
+                                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                                    </svg>
+                                                </a>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<Project> _projects = [];
+    private List<string> _allTech = [];
+    private string? _selectedTech;
+    private bool _loading = true;
+    private string? _error;
+
+    private List<Project> Visible =>
+        _selectedTech is null
+            ? _projects
+            : _projects.Where(p => p.TechStack.Contains(_selectedTech)).ToList();
+
+    // Fullständiga klassnamn så att Tailwind hittar dem vid bygget.
+    private static readonly string[] Accents = ["accent-cyan", "accent-purple", "accent-blue", "accent-green"];
+
+    protected override Task OnInitializedAsync() => LoadProjectsAsync();
+
+    private async Task LoadProjectsAsync()
+    {
+        _loading = true;
+        _error = null;
+
+        try
+        {
+            _projects = await Http.GetFromJsonAsync<List<Project>>($"api/projects?lang={CultureInfo.CurrentUICulture.TwoLetterISOLanguageName}") ?? [];
+            _allTech = _projects
+                .SelectMany(p => p.TechStack)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(t => t, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _selectedTech = null;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or System.Text.Json.JsonException or TaskCanceledException)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    // Klick på redan vald teknik avmarkerar den.
+    private void SelectTech(string? tech) => _selectedTech = _selectedTech == tech ? null : tech;
+
+    // Stabilt hash-index (string.GetHashCode är slumpad per process, så vi summerar tecknen).
+    private static int Stable(string value)
+    {
+        var sum = 0;
+        foreach (var c in value) sum += c;
+        return sum;
+    }
+
+    private static string AccentFor(string key) => Accents[Stable(key) % Accents.Length];
+}

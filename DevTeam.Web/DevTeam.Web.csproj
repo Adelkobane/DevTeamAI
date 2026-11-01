@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- Svenska är neutralt språk (Strings.resx); engelska ligger i satellit-assemblyn Strings.en.resx -->
+    <NeutralLanguage>sv</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="10.0.13" />
+  </ItemGroup>
+
+  <!-- Node-moduler ska inte tas med som innehåll i projektet. -->
+  <ItemGroup>
+    <Content Remove="package.json;package-lock.json" />
+    <None Include="package.json;package-lock.json" />
+  </ItemGroup>
+
+  <!-- Tailwind CSS: installerar npm-paket vid behov och genererar wwwroot/css/tailwind.css före bygget.
+       Kräver Node.js/npm. Hoppa över med: dotnet build -p:SkipTailwind=true -->
+  <Target Name="BuildTailwind" BeforeTargets="BeforeBuild;ResolveStaticWebAssetsInputs" Condition="'$(SkipTailwind)' != 'true'">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('$(MSBuildProjectDirectory)/node_modules')" />
+    <Exec Command="npm run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+</Project>

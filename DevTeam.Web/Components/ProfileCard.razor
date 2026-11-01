@@ -1,0 +1,90 @@
+@using DevTeam.Web.Models
+@inject IStringLocalizer<Strings> L
+
+<article id="@Profile.Id" data-reveal style="--reveal-delay:@(RevealDelayMs)ms"
+         class="glass-card accent-@Accent flex flex-col overflow-hidden p-5 sm:p-8">
+    @* Dekorativ glöd uppe i hörnet *@
+    <div class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full blur-3xl" style="background: rgb(var(--glow) / 0.22)" aria-hidden="true"></div>
+
+    <div class="relative flex items-center gap-5">
+        <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl p-[2px]" style="background: linear-gradient(135deg, rgb(var(--glow)), rgb(59 130 246 / 0.6), rgb(168 85 247 / 0.8)); box-shadow: 0 0 30px -6px rgb(var(--glow) / 0.8)">
+            <div class="flex h-full w-full items-center justify-center rounded-[14px] bg-zinc-950 text-2xl font-bold" style="color: rgb(var(--glow-text))">
+                @Initials
+            </div>
+        </div>
+
+        <div class="min-w-0">
+            <h3 class="truncate text-2xl font-bold tracking-tight text-white">@Profile.Name</h3>
+            <p class="mt-0.5 text-sm font-medium" style="color: rgb(var(--glow-text))">@Profile.Title</p>
+            @if (!string.IsNullOrWhiteSpace(Profile.Location))
+            {
+                <p class="mt-1.5 flex items-center gap-1.5 text-sm text-zinc-400">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" />
+                    </svg>
+                    @Profile.Location
+                </p>
+            }
+        </div>
+    </div>
+
+    <p class="relative mt-6 leading-relaxed text-zinc-300">@Profile.Bio</p>
+
+    <div class="relative mt-8 space-y-5">
+        <SkillGroup Title="@L["Skills.Frontend"]" Skills="Profile.FrontendSkills" Color="cyan" />
+        <SkillGroup Title="@L["Skills.Backend"]" Skills="Profile.BackendSkills" Color="purple" />
+        <SkillGroup Title="@L["Skills.Cloud"]" Skills="Profile.CloudSkills" Color="blue" />
+        <SkillGroup Title="@L["Skills.Quality"]" Skills="Profile.Methodologies" Color="green" />
+    </div>
+
+    @if (HasLinks)
+    {
+        <div class="relative mt-auto flex flex-wrap gap-3 pt-8">
+            @if (!string.IsNullOrWhiteSpace(Profile.GitHubUrl))
+            {
+                <a href="@Profile.GitHubUrl" target="_blank" rel="noopener noreferrer"
+                   aria-label="@L["Profile.GitHubAria", Profile.Name]"
+                   class="btn btn-glass flex-1 !py-2.5 hover:!border-white/60 hover:shadow-[0_0_24px_-4px] hover:shadow-white/40">
+                    <GitHubIcon CssClass="h-4 w-4" />
+                    GitHub
+                </a>
+            }
+            @if (!string.IsNullOrWhiteSpace(Profile.LinkedInUrl))
+            {
+                <a href="@Profile.LinkedInUrl" target="_blank" rel="noopener noreferrer"
+                   aria-label="@L["Profile.LinkedInAria", Profile.Name]"
+                   class="btn btn-glass flex-1 !py-2.5 hover:!border-[#0A66C2]/70 hover:shadow-[0_0_24px_-4px] hover:shadow-[#0A66C2]/60">
+                    <LinkedInIcon CssClass="h-4 w-4 text-[#0A66C2] brightness-125" />
+                    LinkedIn
+                </a>
+            }
+        </div>
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired] public DeveloperProfile Profile { get; set; } = default!;
+
+    /// <summary>cyan | purple | blue | green</summary>
+    [Parameter] public string Accent { get; set; } = "cyan";
+
+    /// <summary>Fördröjning (ms) för scroll-reveal så att korten tonas in i följd.</summary>
+    [Parameter] public int RevealDelayMs { get; set; }
+
+    private bool HasLinks =>
+        !string.IsNullOrWhiteSpace(Profile.GitHubUrl) || !string.IsNullOrWhiteSpace(Profile.LinkedInUrl);
+
+    private string Initials
+    {
+        get
+        {
+            var parts = Profile.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return parts.Length switch
+            {
+                0 => "?",
+                1 => parts[0][..1].ToUpperInvariant(),
+                _ => string.Concat(parts[0][..1], parts[^1][..1]).ToUpperInvariant()
+            };
+        }
+    }
+}

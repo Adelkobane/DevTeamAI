@@ -1,0 +1,66 @@
+@inject IStringLocalizer<Strings> L
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+@* Hero: studions positionering (AI & Modern .NET) med primärknappen "Skapa din appidé nu" som leder till AppBuilder. *@
+<section class="relative">
+    <div class="mx-auto max-w-6xl px-4 pb-16 pt-14 text-center sm:px-6 sm:pb-24 sm:pt-28">
+        <div class="motion-safe:animate-fade-up inline-flex items-center gap-3 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-200 shadow-[0_0_30px_-8px] shadow-emerald-400/60 backdrop-blur-md">
+            <span class="relative flex h-2.5 w-2.5">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping"></span>
+                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+            </span>
+            @L["Hero.Badge"]
+        </div>
+
+        <h1 class="motion-safe:animate-fade-up mt-8 text-[2.25rem] font-extrabold leading-[1.1] tracking-tight text-white [animation-delay:120ms] sm:text-6xl sm:leading-[1.05] lg:text-7xl">
+            @L["Hero.TitleLead"]
+            <span class="text-gradient motion-safe:animate-gradient block">@L["Hero.TitleHighlight"]</span>
+        </h1>
+
+        <p class="motion-safe:animate-fade-up mx-auto mt-7 max-w-3xl text-lg leading-relaxed text-zinc-400 [animation-delay:240ms] sm:text-xl">
+            <span class="font-medium text-zinc-200">Adel Kobansson</span>
+            @L["Hero.IntroRest"]
+        </p>
+
+        <div class="motion-safe:animate-fade-up mt-10 flex flex-col items-center justify-center gap-4 [animation-delay:360ms] sm:flex-row">
+            <a href="@Navigation.AnchorHref("appbyggare")" @onclick="FocusBuilderAsync" class="btn btn-gradient w-full px-8 py-4 text-base sm:w-auto">
+                <SparkleIcon CssClass="h-5 w-5" />
+                @L["Hero.CtaBuilder"]
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+            <a href="@Navigation.AnchorHref("kontakt")" class="btn btn-glass w-full px-8 py-4 text-base sm:w-auto">@L["Hero.CtaContact"]</a>
+        </div>
+
+        <ul class="motion-safe:animate-fade-up mt-14 flex flex-wrap items-center justify-center gap-2.5 [animation-delay:480ms] sm:gap-3 md:pe-44" aria-label="@L["Hero.StackLabel"]">
+            <li class="chip accent-purple whitespace-nowrap">Instant AI Blueprints</li>
+            <li class="chip accent-cyan whitespace-nowrap">AI Agent Architecture</li>
+            <li class="chip accent-blue whitespace-nowrap">Custom SaaS Solutions</li>
+            <li class="chip accent-green whitespace-nowrap">Rapid Prototyping</li>
+            <li class="chip accent-cyan whitespace-nowrap">Cloud-Native .NET</li>
+            <li class="chip accent-purple whitespace-nowrap">Secure APIs</li>
+        </ul>
+
+        <div class="motion-safe:animate-fade-up mt-8 [animation-delay:600ms]">
+            <SystemStatusBar />
+        </div>
+    </div>
+</section>
+
+@code {
+    /// <summary>
+    /// Ankarlänken scrollar till byggaren. När den väl är i bild flyttas fokus till idéfältet, så att besökaren kan börja skriva direkt.
+    /// </summary>
+    private async Task FocusBuilderAsync()
+    {
+        try
+        {
+            await Task.Delay(700); // låt den mjuka scrollningen hinna fram
+            await JS.InvokeVoidAsync("devteam.focusId", "builder-idea");
+        }
+        catch (Exception ex) when (ex is JSException or TaskCanceledException or InvalidOperationException)
+        {
+            // Fokus är bara en bekvämlighet.
+        }
+    }
+}
